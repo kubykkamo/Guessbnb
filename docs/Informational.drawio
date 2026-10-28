@@ -1,0 +1,229 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="Page-1" id="duKfXVCzbKgNusOU_k2K">
+    <mxGraphModel dx="1414" dy="743" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <UserObject label="" mermaidData="{&#xa;  &quot;data&quot;: &quot;flowchart TD\n    %% Kořen webu\n    Root((\&quot;Hlavní stránka\\n/ Index\&quot;))\n\n    %% Základní menu\n    Root --&gt; Login[\&quot;Přihlášení / Registrace\\n(Přesměrování Auth0)\&quot;]\n    Root --&gt; LBoard[\&quot;Globální Žebříček\&quot;]\n    Root --&gt; Play[\&quot;Hrát Hru\&quot;]\n\n    %% Větvení tvorby hry\n    Play --&gt; Create[\&quot;Založit místnost\\n(Host)\&quot;]\n    Play --&gt; Join[\&quot;Připojit se\\n(Guest / User)\&quot;]\n\n    Create --&gt; RoomSettings[\&quot;Lobby: Nastavení\\n- Výběr města\\n- Počet kol\&quot;]\n    RoomSettings --&gt; Lobby[\&quot;Lobby: Čekárna\\n- Zobrazení kódu\\n- Seznam hráčů\\n- Tlačítko Start\&quot;]\n\n    Join --&gt; EnterCode[\&quot;Zadání kódu\\n+ Volba dočasného jména\&quot;]\n    EnterCode --&gt; Lobby\n\n    %% Herní smyčka\n    Lobby --&gt;|\&quot;Odstartuje Host\&quot;| GameLoop[\&quot;Herní Obrazovka\\n(Hádání ceny)\&quot;]\n    \n    GameLoop --&gt; RoundEval[\&quot;Vyhodnocení Kola\\n- Odhalení skutečné ceny\\n- Ukázka tipů soupeřů\\n- Rozdělení bodů\&quot;]\n    \n    RoundEval --&gt;|\&quot;Další kolo\&quot;| GameLoop\n    RoundEval --&gt;|\&quot;Poslední kolo\&quot;| GameOver[\&quot;Konec Hry\\nFinální výsledky místnosti\&quot;]\n\n    %% Akce na konci hry\n    GameOver --&gt;|\&quot;Hrát znovu (Host)\&quot;| Lobby\n    GameOver --&gt;|\&quot;Zavřít / Odejít\&quot;| Root&quot;,&#xa;  &quot;config&quot;: null,&#xa;  &quot;version&quot;: &quot;12&quot;&#xa;}" id="Y-6tenymEXVJkjmjrmuQ-1">
+          <mxCell connectable="0" parent="1" style="group;transparentBounds=1;editIcon=1;lockedGroup=0;groupPadding=10;" vertex="1">
+            <mxGeometry as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Hlavní stránka&#xa;/ Index" mermaidId="n:Root" mermaidBaseStyle="ellipse;html=1;aspect=fixed;strokeWidth=2;whiteSpace=wrap;fillColor=#ffffff;strokeColor=#28253D;fontColor=#28253D;fontFamily=Recursive;fontSize=14;shadow=1;shadowColor=#000000;shadowOffsetX=4;shadowOffsetY=4;shadowBlur=0;shadowOpacity=6;" mermaidBaseValue="Hlavní stránka&#xa;/ Index" id="Y-6tenymEXVJkjmjrmuQ-2">
+          <mxCell parent="Y-6tenymEXVJkjmjrmuQ-1" style="ellipse;html=1;aspect=fixed;strokeWidth=2;whiteSpace=wrap;fillColor=#ffffff;strokeColor=#28253D;fontColor=#28253D;fontFamily=Recursive;fontSize=14;shadow=1;shadowColor=#000000;shadowOffsetX=4;shadowOffsetY=4;shadowBlur=0;shadowOpacity=6;labelWidth=120;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRecursive;" vertex="1">
+            <mxGeometry height="184" width="184" x="302" y="30" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Přihlášení / Registrace&#xa;(Přesměrování Auth0)" mermaidId="n:Login" mermaidBaseStyle="html=1;whiteSpace=wrap;strokeWidth=2;fillColor=#ffffff;strokeColor=#28253D;fontColor=#28253D;fontFamily=Recursive;fontSize=14;shadow=1;shadowColor=#000000;shadowOffsetX=4;shadowOffsetY=4;shadowBlur=0;shadowOpacity=6;" mermaidBaseValue="Přihlášení / Registrace&#xa;(Přesměrování Auth0)" id="Y-6tenymEXVJkjmjrmuQ-3">
+          <mxCell parent="Y-6tenymEXVJkjmjrmuQ-1" style="html=1;whiteSpace=wrap;strokeWidth=2;fillColor=#ffffff;strokeColor=#28253D;fontColor=#28253D;fontFamily=Recursive;fontSize=14;shadow=1;shadowColor=#000000;shadowOffsetX=4;shadowOffsetY=4;shadowBlur=0;shadowOpacity=6;labelWidth=120;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRecursive;" vertex="1">
+            <mxGeometry height="87" width="152" x="30" y="274" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Globální Žebříček" mermaidId="n:LBoard" mermaidBaseStyle="html=1;whiteSpace=wrap;strokeWidth=2;fillColor=#ffffff;strokeColor=#28253D;fontColor=#28253D;fontFamily=Recursive;fontSize=14;shadow=1;shadowColor=#000000;shadowOffsetX=4;shadowOffsetY=4;shadowBlur=0;shadowOpacity=6;" mermaidBaseValue="Globální Žebříček" id="Y-6tenymEXVJkjmjrmuQ-4">
+          <mxCell parent="Y-6tenymEXVJkjmjrmuQ-1" style="html=1;whiteSpace=wrap;strokeWidth=2;fillColor=#ffffff;strokeColor=#28253D;fontColor=#28253D;fontFamily=Recursive;fontSize=14;shadow=1;shadowColor=#000000;shadowOffsetX=4;shadowOffsetY=4;shadowBlur=0;shadowOpacity=6;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRecursive;" vertex="1">
+            <mxGeometry height="45" width="152" x="222" y="274" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Hrát Hru" mermaidId="n:Play" mermaidBaseStyle="html=1;whiteSpace=wrap;strokeWidth=2;fillColor=#ffffff;strokeColor=#28253D;fontColor=#28253D;fontFamily=Recursive;fontSize=14;shadow=1;shadowColor=#000000;shadowOffsetX=4;shadowOffsetY=4;shadowBlur=0;shadowOpacity=6;" mermaidBaseValue="Hrát Hru" id="Y-6tenymEXVJkjmjrmuQ-5">
+          <mxCell parent="Y-6tenymEXVJkjmjrmuQ-1" style="html=1;whiteSpace=wrap;strokeWidth=2;fillColor=#ffffff;strokeColor=#28253D;fontColor=#28253D;fontFamily=Recursive;fontSize=14;shadow=1;shadowColor=#000000;shadowOffsetX=4;shadowOffsetY=4;shadowBlur=0;shadowOpacity=6;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRecursive;" vertex="1">
+            <mxGeometry height="45" width="152" x="414" y="302" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Založit místnost&#xa;(Host)" mermaidId="n:Create" mermaidBaseStyle="html=1;whiteSpace=wrap;strokeWidth=2;fillColor=#ffffff;strokeColor=#28253D;fontColor=#28253D;fontFamily=Recursive;fontSize=14;shadow=1;shadowColor=#000000;shadowOffsetX=4;shadowOffsetY=4;shadowBlur=0;shadowOpacity=6;" mermaidBaseValue="Založit místnost&#xa;(Host)" id="Y-6tenymEXVJkjmjrmuQ-6">
+          <mxCell parent="Y-6tenymEXVJkjmjrmuQ-1" style="html=1;whiteSpace=wrap;strokeWidth=2;fillColor=#ffffff;strokeColor=#28253D;fontColor=#28253D;fontFamily=Recursive;fontSize=14;shadow=1;shadowColor=#000000;shadowOffsetX=4;shadowOffsetY=4;shadowBlur=0;shadowOpacity=6;labelWidth=120;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRecursive;" vertex="1">
+            <mxGeometry height="67" width="152" x="318" y="411" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Připojit se&#xa;(Guest / User)" mermaidId="n:Join" mermaidBaseStyle="html=1;whiteSpace=wrap;strokeWidth=2;fillColor=#ffffff;strokeColor=#28253D;fontColor=#28253D;fontFamily=Recursive;fontSize=14;shadow=1;shadowColor=#000000;shadowOffsetX=4;shadowOffsetY=4;shadowBlur=0;shadowOpacity=6;" mermaidBaseValue="Připojit se&#xa;(Guest / User)" id="Y-6tenymEXVJkjmjrmuQ-7">
+          <mxCell parent="Y-6tenymEXVJkjmjrmuQ-1" style="html=1;whiteSpace=wrap;strokeWidth=2;fillColor=#ffffff;strokeColor=#28253D;fontColor=#28253D;fontFamily=Recursive;fontSize=14;shadow=1;shadowColor=#000000;shadowOffsetX=4;shadowOffsetY=4;shadowBlur=0;shadowOpacity=6;labelWidth=120;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRecursive;" vertex="1">
+            <mxGeometry height="87" width="152" x="510" y="401" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Lobby: Nastavení&#xa;- Výběr města&#xa;- Počet kol" mermaidId="n:RoomSettings" mermaidBaseStyle="html=1;whiteSpace=wrap;strokeWidth=2;fillColor=#ffffff;strokeColor=#28253D;fontColor=#28253D;fontFamily=Recursive;fontSize=14;shadow=1;shadowColor=#000000;shadowOffsetX=4;shadowOffsetY=4;shadowBlur=0;shadowOpacity=6;" mermaidBaseValue="Lobby: Nastavení&#xa;- Výběr města&#xa;- Počet kol" id="Y-6tenymEXVJkjmjrmuQ-8">
+          <mxCell parent="Y-6tenymEXVJkjmjrmuQ-1" style="html=1;whiteSpace=wrap;strokeWidth=2;fillColor=#ffffff;strokeColor=#28253D;fontColor=#28253D;fontFamily=Recursive;fontSize=14;shadow=1;shadowColor=#000000;shadowOffsetX=4;shadowOffsetY=4;shadowBlur=0;shadowOpacity=6;labelWidth=120;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRecursive;" vertex="1">
+            <mxGeometry height="108" width="152" x="318" y="527" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Lobby: Čekárna&#xa;- Zobrazení kódu&#xa;- Seznam hráčů&#xa;- Tlačítko Start" mermaidId="n:Lobby" mermaidBaseStyle="html=1;whiteSpace=wrap;strokeWidth=2;fillColor=#ffffff;strokeColor=#28253D;fontColor=#28253D;fontFamily=Recursive;fontSize=14;shadow=1;shadowColor=#000000;shadowOffsetX=4;shadowOffsetY=4;shadowBlur=0;shadowOpacity=6;" mermaidBaseValue="Lobby: Čekárna&#xa;- Zobrazení kódu&#xa;- Seznam hráčů&#xa;- Tlačítko Start" id="Y-6tenymEXVJkjmjrmuQ-9">
+          <mxCell parent="Y-6tenymEXVJkjmjrmuQ-1" style="html=1;whiteSpace=wrap;strokeWidth=2;fillColor=#ffffff;strokeColor=#28253D;fontColor=#28253D;fontFamily=Recursive;fontSize=14;shadow=1;shadowColor=#000000;shadowOffsetX=4;shadowOffsetY=4;shadowBlur=0;shadowOpacity=6;labelWidth=120;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRecursive;" vertex="1">
+            <mxGeometry height="150" width="152" x="414" y="675" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Zadání kódu&#xa;+ Volba dočasného jména" mermaidId="n:EnterCode" mermaidBaseStyle="html=1;whiteSpace=wrap;strokeWidth=2;fillColor=#ffffff;strokeColor=#28253D;fontColor=#28253D;fontFamily=Recursive;fontSize=14;shadow=1;shadowColor=#000000;shadowOffsetX=4;shadowOffsetY=4;shadowBlur=0;shadowOpacity=6;" mermaidBaseValue="Zadání kódu&#xa;+ Volba dočasného jména" id="Y-6tenymEXVJkjmjrmuQ-10">
+          <mxCell parent="Y-6tenymEXVJkjmjrmuQ-1" style="html=1;whiteSpace=wrap;strokeWidth=2;fillColor=#ffffff;strokeColor=#28253D;fontColor=#28253D;fontFamily=Recursive;fontSize=14;shadow=1;shadowColor=#000000;shadowOffsetX=4;shadowOffsetY=4;shadowBlur=0;shadowOpacity=6;labelWidth=120;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRecursive;" vertex="1">
+            <mxGeometry height="87" width="152" x="510" y="538" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Herní Obrazovka&#xa;(Hádání ceny)" mermaidId="n:GameLoop" mermaidBaseStyle="html=1;whiteSpace=wrap;strokeWidth=2;fillColor=#ffffff;strokeColor=#28253D;fontColor=#28253D;fontFamily=Recursive;fontSize=14;shadow=1;shadowColor=#000000;shadowOffsetX=4;shadowOffsetY=4;shadowBlur=0;shadowOpacity=6;" mermaidBaseValue="Herní Obrazovka&#xa;(Hádání ceny)" id="Y-6tenymEXVJkjmjrmuQ-11">
+          <mxCell parent="Y-6tenymEXVJkjmjrmuQ-1" style="html=1;whiteSpace=wrap;strokeWidth=2;fillColor=#ffffff;strokeColor=#28253D;fontColor=#28253D;fontFamily=Recursive;fontSize=14;shadow=1;shadowColor=#000000;shadowOffsetX=4;shadowOffsetY=4;shadowBlur=0;shadowOpacity=6;labelWidth=120;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRecursive;" vertex="1">
+            <mxGeometry height="87" width="152" x="346" y="926" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Vyhodnocení Kola&#xa;- Odhalení skutečné ceny&#xa;- Ukázka tipů soupeřů&#xa;- Rozdělení bodů" mermaidId="n:RoundEval" mermaidBaseStyle="html=1;whiteSpace=wrap;strokeWidth=2;fillColor=#ffffff;strokeColor=#28253D;fontColor=#28253D;fontFamily=Recursive;fontSize=14;shadow=1;shadowColor=#000000;shadowOffsetX=4;shadowOffsetY=4;shadowBlur=0;shadowOpacity=6;" mermaidBaseValue="Vyhodnocení Kola&#xa;- Odhalení skutečné ceny&#xa;- Ukázka tipů soupeřů&#xa;- Rozdělení bodů" id="Y-6tenymEXVJkjmjrmuQ-12">
+          <mxCell parent="Y-6tenymEXVJkjmjrmuQ-1" style="html=1;whiteSpace=wrap;strokeWidth=2;fillColor=#ffffff;strokeColor=#28253D;fontColor=#28253D;fontFamily=Recursive;fontSize=14;shadow=1;shadowColor=#000000;shadowOffsetX=4;shadowOffsetY=4;shadowBlur=0;shadowOpacity=6;labelWidth=120;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRecursive;" vertex="1">
+            <mxGeometry height="150" width="152" x="346" y="1114" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Konec Hry&#xa;Finální výsledky místnosti" mermaidId="n:GameOver" mermaidBaseStyle="html=1;whiteSpace=wrap;strokeWidth=2;fillColor=#ffffff;strokeColor=#28253D;fontColor=#28253D;fontFamily=Recursive;fontSize=14;shadow=1;shadowColor=#000000;shadowOffsetX=4;shadowOffsetY=4;shadowBlur=0;shadowOpacity=6;" mermaidBaseValue="Konec Hry&#xa;Finální výsledky místnosti" id="Y-6tenymEXVJkjmjrmuQ-13">
+          <mxCell parent="Y-6tenymEXVJkjmjrmuQ-1" style="html=1;whiteSpace=wrap;strokeWidth=2;fillColor=#ffffff;strokeColor=#28253D;fontColor=#28253D;fontFamily=Recursive;fontSize=14;shadow=1;shadowColor=#000000;shadowOffsetX=4;shadowOffsetY=4;shadowBlur=0;shadowOpacity=6;labelWidth=120;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRecursive;" vertex="1">
+            <mxGeometry height="108" width="152" x="468" y="1365" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:Root-&gt;Login#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;curved=0;startArrow=none;endArrow=block;endSize=8;jumpStyle=arc;jumpSize=12;strokeColor=#000000;exitX=0.23;exitY=1;entryX=0.5;entryY=0;strokeWidth=2;targetPerimeterSpacing=4;" mermaidBaseValue="" id="Y-6tenymEXVJkjmjrmuQ-14">
+          <mxCell edge="1" parent="Y-6tenymEXVJkjmjrmuQ-1" source="Y-6tenymEXVJkjmjrmuQ-2" style="edgeStyle=orthogonalEdgeStyle;rounded=1;curved=0;startArrow=none;endArrow=block;endSize=8;jumpStyle=arc;jumpSize=12;strokeColor=#000000;exitX=0.23;exitY=1;entryX=0.5;entryY=0;strokeWidth=2;targetPerimeterSpacing=4;" target="Y-6tenymEXVJkjmjrmuQ-3">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="345" y="234" />
+                <mxPoint x="106" y="234" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:Root-&gt;LBoard#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;curved=0;startArrow=none;endArrow=block;endSize=8;jumpStyle=arc;jumpSize=12;strokeColor=#000000;exitX=0.41;exitY=1;entryX=0.5;entryY=0;strokeWidth=2;targetPerimeterSpacing=4;" mermaidBaseValue="" id="Y-6tenymEXVJkjmjrmuQ-15">
+          <mxCell edge="1" parent="Y-6tenymEXVJkjmjrmuQ-1" source="Y-6tenymEXVJkjmjrmuQ-2" style="edgeStyle=orthogonalEdgeStyle;rounded=1;curved=0;startArrow=none;endArrow=block;endSize=8;jumpStyle=arc;jumpSize=12;strokeColor=#000000;exitX=0.41;exitY=1;entryX=0.5;entryY=0;strokeWidth=2;targetPerimeterSpacing=4;" target="Y-6tenymEXVJkjmjrmuQ-4">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="378" y="254" />
+                <mxPoint x="298" y="254" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:Root-&gt;Play#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;curved=0;startArrow=none;endArrow=block;endSize=8;jumpStyle=arc;jumpSize=12;strokeColor=#000000;exitX=0.59;exitY=1;entryX=0.5;entryY=0;strokeWidth=2;targetPerimeterSpacing=4;" mermaidBaseValue="" id="Y-6tenymEXVJkjmjrmuQ-16">
+          <mxCell edge="1" parent="Y-6tenymEXVJkjmjrmuQ-1" source="Y-6tenymEXVJkjmjrmuQ-2" style="edgeStyle=orthogonalEdgeStyle;rounded=1;curved=0;startArrow=none;endArrow=block;endSize=8;jumpStyle=arc;jumpSize=12;strokeColor=#000000;exitX=0.59;exitY=1;entryX=0.5;entryY=0;strokeWidth=2;targetPerimeterSpacing=4;" target="Y-6tenymEXVJkjmjrmuQ-5">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="410" y="254" />
+                <mxPoint x="490" y="254" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:Play-&gt;Create#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;curved=0;startArrow=none;endArrow=block;endSize=8;jumpStyle=arc;jumpSize=12;strokeColor=#000000;exitX=0.36;exitY=0.99;entryX=0.5;entryY=0;strokeWidth=2;targetPerimeterSpacing=4;" mermaidBaseValue="" id="Y-6tenymEXVJkjmjrmuQ-17">
+          <mxCell edge="1" parent="Y-6tenymEXVJkjmjrmuQ-1" source="Y-6tenymEXVJkjmjrmuQ-5" style="edgeStyle=orthogonalEdgeStyle;rounded=1;curved=0;startArrow=none;endArrow=block;endSize=8;jumpStyle=arc;jumpSize=12;strokeColor=#000000;exitX=0.36;exitY=0.99;entryX=0.5;entryY=0;strokeWidth=2;targetPerimeterSpacing=4;" target="Y-6tenymEXVJkjmjrmuQ-6">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="468" y="381" />
+                <mxPoint x="394" y="381" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:Play-&gt;Join#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;curved=0;startArrow=none;endArrow=block;endSize=8;jumpStyle=arc;jumpSize=12;strokeColor=#000000;exitX=0.64;exitY=0.99;entryX=0.5;entryY=0;strokeWidth=2;targetPerimeterSpacing=4;" mermaidBaseValue="" id="Y-6tenymEXVJkjmjrmuQ-18">
+          <mxCell edge="1" parent="Y-6tenymEXVJkjmjrmuQ-1" source="Y-6tenymEXVJkjmjrmuQ-5" style="edgeStyle=orthogonalEdgeStyle;rounded=1;curved=0;startArrow=none;endArrow=block;endSize=8;jumpStyle=arc;jumpSize=12;strokeColor=#000000;exitX=0.64;exitY=0.99;entryX=0.5;entryY=0;strokeWidth=2;targetPerimeterSpacing=4;" target="Y-6tenymEXVJkjmjrmuQ-7">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="512" y="381" />
+                <mxPoint x="586" y="381" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:Create-&gt;RoomSettings#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;curved=0;startArrow=none;endArrow=block;endSize=8;jumpStyle=arc;jumpSize=12;strokeColor=#000000;exitX=0.5;exitY=0.99;entryX=0.5;entryY=0;strokeWidth=2;targetPerimeterSpacing=4;" mermaidBaseValue="" id="Y-6tenymEXVJkjmjrmuQ-19">
+          <mxCell edge="1" parent="Y-6tenymEXVJkjmjrmuQ-1" source="Y-6tenymEXVJkjmjrmuQ-6" style="edgeStyle=orthogonalEdgeStyle;rounded=1;curved=0;startArrow=none;endArrow=block;endSize=8;jumpStyle=arc;jumpSize=12;strokeColor=#000000;exitX=0.5;exitY=0.99;entryX=0.5;entryY=0;strokeWidth=2;targetPerimeterSpacing=4;" target="Y-6tenymEXVJkjmjrmuQ-8">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points" />
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:RoomSettings-&gt;Lobby#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;curved=0;startArrow=none;endArrow=block;endSize=8;jumpStyle=arc;jumpSize=12;strokeColor=#000000;exitX=0.5;exitY=1;entryX=0.36;entryY=0;strokeWidth=2;targetPerimeterSpacing=4;" mermaidBaseValue="" id="Y-6tenymEXVJkjmjrmuQ-20">
+          <mxCell edge="1" parent="Y-6tenymEXVJkjmjrmuQ-1" source="Y-6tenymEXVJkjmjrmuQ-8" style="edgeStyle=orthogonalEdgeStyle;rounded=1;curved=0;startArrow=none;endArrow=block;endSize=8;jumpStyle=arc;jumpSize=12;strokeColor=#000000;exitX=0.5;exitY=1;entryX=0.36;entryY=0;strokeWidth=2;targetPerimeterSpacing=4;" target="Y-6tenymEXVJkjmjrmuQ-9">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="394" y="655" />
+                <mxPoint x="468" y="655" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:Join-&gt;EnterCode#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;curved=0;startArrow=none;endArrow=block;endSize=8;jumpStyle=arc;jumpSize=12;strokeColor=#000000;exitX=0.5;exitY=0.99;entryX=0.5;entryY=0;strokeWidth=2;targetPerimeterSpacing=4;" mermaidBaseValue="" id="Y-6tenymEXVJkjmjrmuQ-21">
+          <mxCell edge="1" parent="Y-6tenymEXVJkjmjrmuQ-1" source="Y-6tenymEXVJkjmjrmuQ-7" style="edgeStyle=orthogonalEdgeStyle;rounded=1;curved=0;startArrow=none;endArrow=block;endSize=8;jumpStyle=arc;jumpSize=12;strokeColor=#000000;exitX=0.5;exitY=0.99;entryX=0.5;entryY=0;strokeWidth=2;targetPerimeterSpacing=4;" target="Y-6tenymEXVJkjmjrmuQ-10">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points" />
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:EnterCode-&gt;Lobby#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;curved=0;startArrow=none;endArrow=block;endSize=8;jumpStyle=arc;jumpSize=12;strokeColor=#000000;exitX=0.5;exitY=0.99;entryX=0.64;entryY=0;strokeWidth=2;targetPerimeterSpacing=4;" mermaidBaseValue="" id="Y-6tenymEXVJkjmjrmuQ-22">
+          <mxCell edge="1" parent="Y-6tenymEXVJkjmjrmuQ-1" source="Y-6tenymEXVJkjmjrmuQ-10" style="edgeStyle=orthogonalEdgeStyle;rounded=1;curved=0;startArrow=none;endArrow=block;endSize=8;jumpStyle=arc;jumpSize=12;strokeColor=#000000;exitX=0.5;exitY=0.99;entryX=0.64;entryY=0;strokeWidth=2;targetPerimeterSpacing=4;" target="Y-6tenymEXVJkjmjrmuQ-9">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="586" y="655" />
+                <mxPoint x="512" y="655" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="Odstartuje Host" mermaidId="e:Lobby-&gt;GameLoop#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;curved=0;startArrow=none;endArrow=block;endSize=8;jumpStyle=arc;jumpSize=12;strokeColor=#000000;html=1;fontSize=16;labelBackgroundColor=#cccccc;fontFamily=Recursive;fontColor=#28253D;exitX=0.36;exitY=1;entryX=0.5;entryY=0;strokeWidth=2;targetPerimeterSpacing=4;" mermaidBaseValue="Odstartuje Host" id="Y-6tenymEXVJkjmjrmuQ-23">
+          <mxCell edge="1" parent="Y-6tenymEXVJkjmjrmuQ-1" source="Y-6tenymEXVJkjmjrmuQ-9" style="edgeStyle=orthogonalEdgeStyle;rounded=1;curved=0;startArrow=none;endArrow=block;endSize=8;jumpStyle=arc;jumpSize=12;strokeColor=#000000;html=1;fontSize=14;labelBackgroundColor=#cccccc;fontFamily=Recursive;fontColor=#28253D;exitX=0.36;exitY=1;entryX=0.5;entryY=0;strokeWidth=2;targetPerimeterSpacing=4;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRecursive;" target="Y-6tenymEXVJkjmjrmuQ-11">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="468" y="845" />
+                <mxPoint x="422" y="845" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:GameLoop-&gt;RoundEval#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;curved=0;startArrow=none;endArrow=block;endSize=8;jumpStyle=arc;jumpSize=12;strokeColor=#000000;exitX=0.35;exitY=0.99;entryX=0.35;entryY=0;strokeWidth=2;targetPerimeterSpacing=4;" mermaidBaseValue="" id="Y-6tenymEXVJkjmjrmuQ-24">
+          <mxCell edge="1" parent="Y-6tenymEXVJkjmjrmuQ-1" source="Y-6tenymEXVJkjmjrmuQ-11" style="edgeStyle=orthogonalEdgeStyle;rounded=1;curved=0;startArrow=none;endArrow=block;endSize=8;jumpStyle=arc;jumpSize=12;strokeColor=#000000;exitX=0.35;exitY=0.99;entryX=0.35;entryY=0;strokeWidth=2;targetPerimeterSpacing=4;" target="Y-6tenymEXVJkjmjrmuQ-12">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points" />
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="Další kolo" mermaidId="e:RoundEval-&gt;GameLoop#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;curved=0;startArrow=none;endArrow=block;endSize=8;jumpStyle=arc;jumpSize=12;strokeColor=#000000;html=1;fontSize=16;labelBackgroundColor=#cccccc;fontFamily=Recursive;fontColor=#28253D;exitX=0.64;exitY=0;entryX=0.64;entryY=0.99;strokeWidth=2;targetPerimeterSpacing=4;" mermaidBaseValue="Další kolo" id="Y-6tenymEXVJkjmjrmuQ-25">
+          <mxCell edge="1" parent="Y-6tenymEXVJkjmjrmuQ-1" source="Y-6tenymEXVJkjmjrmuQ-12" style="edgeStyle=orthogonalEdgeStyle;rounded=1;curved=0;startArrow=none;endArrow=block;endSize=8;jumpStyle=arc;jumpSize=12;strokeColor=#000000;html=1;fontSize=14;labelBackgroundColor=#cccccc;fontFamily=Recursive;fontColor=#28253D;exitX=0.64;exitY=0;entryX=0.64;entryY=0.99;strokeWidth=2;targetPerimeterSpacing=4;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRecursive;" target="Y-6tenymEXVJkjmjrmuQ-11">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points" />
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="Poslední kolo" mermaidId="e:RoundEval-&gt;GameOver#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;curved=0;startArrow=none;endArrow=block;endSize=8;jumpStyle=arc;jumpSize=12;strokeColor=#000000;html=1;fontSize=16;labelBackgroundColor=#cccccc;fontFamily=Recursive;fontColor=#28253D;exitX=0.5;exitY=1;entryX=0.28;entryY=0;strokeWidth=2;targetPerimeterSpacing=4;" mermaidBaseValue="Poslední kolo" id="Y-6tenymEXVJkjmjrmuQ-26">
+          <mxCell edge="1" parent="Y-6tenymEXVJkjmjrmuQ-1" source="Y-6tenymEXVJkjmjrmuQ-12" style="edgeStyle=orthogonalEdgeStyle;rounded=1;curved=0;startArrow=none;endArrow=block;endSize=8;jumpStyle=arc;jumpSize=12;strokeColor=#000000;html=1;fontSize=14;labelBackgroundColor=#cccccc;fontFamily=Recursive;fontColor=#28253D;exitX=0.5;exitY=1;entryX=0.28;entryY=0;strokeWidth=2;targetPerimeterSpacing=4;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRecursive;" target="Y-6tenymEXVJkjmjrmuQ-13">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="422" y="1345" />
+                <mxPoint x="511" y="1345" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="Hrát znovu (Host)" mermaidId="e:GameOver-&gt;Lobby#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;curved=0;startArrow=none;endArrow=block;endSize=8;jumpStyle=arc;jumpSize=12;strokeColor=#000000;html=1;fontSize=16;labelBackgroundColor=#cccccc;fontFamily=Recursive;fontColor=#28253D;exitX=0.5;exitY=0;entryX=0.64;entryY=1;strokeWidth=2;targetPerimeterSpacing=4;" mermaidBaseValue="Hrát znovu (Host)" id="Y-6tenymEXVJkjmjrmuQ-27">
+          <mxCell edge="1" parent="Y-6tenymEXVJkjmjrmuQ-1" source="Y-6tenymEXVJkjmjrmuQ-13" style="edgeStyle=orthogonalEdgeStyle;rounded=1;curved=0;startArrow=none;endArrow=block;endSize=8;jumpStyle=arc;jumpSize=12;strokeColor=#000000;html=1;fontSize=14;labelBackgroundColor=#cccccc;fontFamily=Recursive;fontColor=#28253D;exitX=0.5;exitY=0;entryX=0.64;entryY=1;strokeWidth=2;targetPerimeterSpacing=4;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRecursive;" target="Y-6tenymEXVJkjmjrmuQ-9">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="544" y="1345" />
+                <mxPoint x="564" y="1345" />
+                <mxPoint x="564" y="1314" />
+                <mxPoint x="564" y="1189" />
+                <mxPoint x="564" y="969" />
+                <mxPoint x="564" y="876" />
+                <mxPoint x="564" y="845" />
+                <mxPoint x="512" y="845" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="Zavřít / Odejít" mermaidId="e:GameOver-&gt;Root#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;curved=0;startArrow=none;endArrow=block;endSize=8;jumpStyle=arc;jumpSize=12;strokeColor=#000000;html=1;fontSize=16;labelBackgroundColor=#cccccc;fontFamily=Recursive;fontColor=#28253D;exitX=0.71;exitY=0;entryX=0.77;entryY=1;strokeWidth=2;targetPerimeterSpacing=4;" mermaidBaseValue="Zavřít / Odejít" id="Y-6tenymEXVJkjmjrmuQ-28">
+          <mxCell edge="1" parent="Y-6tenymEXVJkjmjrmuQ-1" source="Y-6tenymEXVJkjmjrmuQ-13" style="edgeStyle=orthogonalEdgeStyle;rounded=1;curved=0;startArrow=none;endArrow=block;endSize=8;jumpStyle=arc;jumpSize=12;strokeColor=#000000;html=1;fontSize=14;labelBackgroundColor=#cccccc;fontFamily=Recursive;fontColor=#28253D;exitX=0.71;exitY=0;entryX=0.77;entryY=1;strokeWidth=2;targetPerimeterSpacing=4;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRecursive;" target="Y-6tenymEXVJkjmjrmuQ-2">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="577" y="1345" />
+                <mxPoint x="682" y="1345" />
+                <mxPoint x="682" y="1314" />
+                <mxPoint x="682" y="1189" />
+                <mxPoint x="682" y="1063" />
+                <mxPoint x="682" y="969" />
+                <mxPoint x="682" y="750" />
+                <mxPoint x="682" y="581" />
+                <mxPoint x="682" y="444" />
+                <mxPoint x="682" y="317" />
+                <mxPoint x="682" y="234" />
+                <mxPoint x="443" y="234" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

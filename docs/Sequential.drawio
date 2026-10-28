@@ -1,0 +1,305 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="Page-1" id="rPI8Sd9QNoDRwsvjcHCG">
+    <mxGraphModel dx="1704" dy="895" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <UserObject label="" mermaidData="{&#xa;  &quot;data&quot;: &quot;sequenceDiagram\n    autonumber\n    actor Client as Hráč (Frontend)\n    participant Auth as Auth0\n    participant API as FastAPI (Backend)\n    participant DB as SQLite (Databáze)\n\n    %% Fáze 1: Přihlášení\n    rect rgb(240, 248, 255)\n        Note right of Client: Fáze 1: Autentizace\n        Client-&gt;&gt;Auth: Přihlášení / Registrace\n        Auth--&gt;&gt;Client: Vrátí podepsaný JWT Token\n    end\n\n    %% Fáze 2: Lobby a WebSockets\n    rect rgb(255, 245, 238)\n        Note right of Client: Fáze 2: Lobby (WebSockets)\n        Client-&gt;&gt;API: WSS: Připojení k místnosti (pošle JWT a kód)\n        Note over API: Validace JWT (ověření Auth0 podpisu)\n        API--&gt;&gt;Client: WSS: Úspěšně připojeno (přidělení role Host/Guest)\n        \n        Client-&gt;&gt;API: WSS: Host spouští hru (město: Praha, kola: 5)\n        API-&gt;&gt;DB: SELECT ubytovani ORDER BY RANDOM() LIMIT 5\n        DB--&gt;&gt;API: Vrátí data (včetně reálné ceny a odkazů na R2 fotky)\n    end\n\n    %% Fáze 3: Průběh hry (Smyčka)\n    rect rgb(240, 255, 240)\n        Note right of Client: Fáze 3: Herní smyčka (opakuje se pro každé kolo)\n        loop Pro každé z 5 kol\n            API--&gt;&gt;Client: WSS: Zobrazit byt (fotky, parametry - BEZ CENY)\n            Client-&gt;&gt;API: WSS: Odeslat tip (např. 1500 Kč)\n            \n            Note over API: Čekání na tipy všech hráčů&lt;br/&gt;nebo vypršení 30s limitu\n            \n            Note over API: Výpočet procentuální odchylky&lt;br/&gt;a přidělení bodů (abs/real * 100)\n            \n            API--&gt;&gt;Client: WSS: Konec kola (vyhlášení reálné ceny a bodů)\n        end\n    end\n\n    %% Fáze 4: Konec hry a uložení\n    rect rgb(253, 245, 253)\n        Note right of Client: Fáze 4: Vyhodnocení\n        API--&gt;&gt;Client: WSS: Konec hry (Zobrazení finálního žebříčku místnosti)\n        Note over API: Filtrace pouze registrovaných hráčů (Auth0 ID)\n        API-&gt;&gt;DB: UPDATE users SET global_score = global_score + body\n        DB--&gt;&gt;API: Potvrzení zápisu\n        Client-&gt;&gt;API: WSS: Host kliká na \&quot;Hrát znovu\&quot;\n        API--&gt;&gt;Client: WSS: Reset místnosti do stavu Lobby\n    end&quot;,&#xa;  &quot;config&quot;: null,&#xa;  &quot;version&quot;: &quot;12&quot;&#xa;}" id="TpiaW6xQ_7IwXyguLgQe-1">
+          <mxCell connectable="0" parent="1" style="group;transparentBounds=1;editIcon=1;lockedGroup=0;groupPadding=10;" vertex="1">
+            <mxGeometry as="geometry" />
+          </mxCell>
+        </UserObject>
+        <mxCell id="TpiaW6xQ_7IwXyguLgQe-2" parent="TpiaW6xQ_7IwXyguLgQe-1" style="html=1;rounded=0;strokeColor=none;fillColor=#f0f8ff;fillOpacity=100;pointerEvents=0;fontColor=#28253D;fontFamily=Recursive;fontSize=16;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRecursive;" value="" vertex="1">
+          <mxGeometry height="159" width="288" x="95" y="113" as="geometry" />
+        </mxCell>
+        <mxCell id="TpiaW6xQ_7IwXyguLgQe-3" parent="TpiaW6xQ_7IwXyguLgQe-1" style="html=1;rounded=0;strokeColor=none;fillColor=#fff5ee;fillOpacity=100;pointerEvents=0;fontColor=#28253D;fontFamily=Recursive;fontSize=16;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRecursive;" value="" vertex="1">
+          <mxGeometry height="344" width="1007" x="95" y="282" as="geometry" />
+        </mxCell>
+        <mxCell id="TpiaW6xQ_7IwXyguLgQe-4" parent="TpiaW6xQ_7IwXyguLgQe-1" style="html=1;rounded=0;strokeColor=none;fillColor=#f0fff0;fillOpacity=100;pointerEvents=0;fontColor=#28253D;fontFamily=Recursive;fontSize=16;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRecursive;" value="" vertex="1">
+          <mxGeometry height="388" width="683" x="85" y="636" as="geometry" />
+        </mxCell>
+        <mxCell id="TpiaW6xQ_7IwXyguLgQe-5" parent="TpiaW6xQ_7IwXyguLgQe-1" style="html=1;rounded=0;strokeColor=none;fillColor=#fdf5fd;fillOpacity=100;pointerEvents=0;fontColor=#28253D;fontFamily=Recursive;fontSize=16;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRecursive;" value="" vertex="1">
+          <mxGeometry height="344" width="1007" x="95" y="1034" as="geometry" />
+        </mxCell>
+        <UserObject label="Hráč (Frontend)" mermaidId="n:Client" mermaidBaseStyle="html=1;shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;newEdgeStyle={&quot;edgeStyle&quot;:&quot;sequenceEdgeStyle&quot;,&quot;libavoidRouting&quot;:0,&quot;curved&quot;:0,&quot;rounded&quot;:0};lifelineDashed=0;strokeWidth=2;rounded=1;absoluteArcSize=1;arcSize=12;lifelineColor=#28253D;fillColor=#FDF4FF;strokeColor=#E879F9;fontColor=#28253D;participant=seqActorStick;verticalAlign=bottom;align=center;spacingBottom=4;size=90;lifelineMirror=1;fontFamily=Recursive;fontSize=16;shadow=1;shadowColor=#000000;shadowOffsetX=4;shadowOffsetY=4;shadowBlur=0;shadowOpacity=6;" mermaidBaseValue="Hráč (Frontend)" id="TpiaW6xQ_7IwXyguLgQe-6">
+          <mxCell parent="TpiaW6xQ_7IwXyguLgQe-1" style="html=1;shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;newEdgeStyle={&quot;edgeStyle&quot;:&quot;sequenceEdgeStyle&quot;,&quot;libavoidRouting&quot;:0,&quot;curved&quot;:0,&quot;rounded&quot;:0};lifelineDashed=0;strokeWidth=2;rounded=1;absoluteArcSize=1;arcSize=12;lifelineColor=#28253D;fillColor=#FDF4FF;strokeColor=#E879F9;fontColor=#28253D;participant=seqActorStick;verticalAlign=bottom;align=center;spacingBottom=4;size=90;lifelineMirror=1;fontFamily=Recursive;fontSize=16;shadow=1;shadowColor=#000000;shadowOffsetX=4;shadowOffsetY=4;shadowBlur=0;shadowOpacity=6;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRecursive;" vertex="1">
+            <mxGeometry height="1458" width="150" x="30" y="30" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Auth0" mermaidId="n:Auth" mermaidBaseStyle="html=1;shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;newEdgeStyle={&quot;edgeStyle&quot;:&quot;sequenceEdgeStyle&quot;,&quot;libavoidRouting&quot;:0,&quot;curved&quot;:0,&quot;rounded&quot;:0};lifelineDashed=0;strokeWidth=2;rounded=1;absoluteArcSize=1;arcSize=12;lifelineColor=#28253D;fillColor=#F0FDFA;strokeColor=#2DD4BF;fontColor=#28253D;size=73;lifelineMirror=1;fontFamily=Recursive;fontSize=16;shadow=1;shadowColor=#000000;shadowOffsetX=4;shadowOffsetY=4;shadowBlur=0;shadowOpacity=6;" mermaidBaseValue="Auth0" id="TpiaW6xQ_7IwXyguLgQe-7">
+          <mxCell parent="TpiaW6xQ_7IwXyguLgQe-1" style="html=1;shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;newEdgeStyle={&quot;edgeStyle&quot;:&quot;sequenceEdgeStyle&quot;,&quot;libavoidRouting&quot;:0,&quot;curved&quot;:0,&quot;rounded&quot;:0};lifelineDashed=0;strokeWidth=2;rounded=1;absoluteArcSize=1;arcSize=12;lifelineColor=#28253D;fillColor=#F0FDFA;strokeColor=#2DD4BF;fontColor=#28253D;size=73;lifelineMirror=1;fontFamily=Recursive;fontSize=16;shadow=1;shadowColor=#000000;shadowOffsetX=4;shadowOffsetY=4;shadowBlur=0;shadowOpacity=6;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRecursive;" vertex="1">
+            <mxGeometry height="1441" width="150" x="298" y="30" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="FastAPI (Backend)" mermaidId="n:API" mermaidBaseStyle="html=1;shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;newEdgeStyle={&quot;edgeStyle&quot;:&quot;sequenceEdgeStyle&quot;,&quot;libavoidRouting&quot;:0,&quot;curved&quot;:0,&quot;rounded&quot;:0};lifelineDashed=0;strokeWidth=2;rounded=1;absoluteArcSize=1;arcSize=12;lifelineColor=#28253D;fillColor=#FFF7ED;strokeColor=#FB923C;fontColor=#28253D;size=73;lifelineMirror=1;fontFamily=Recursive;fontSize=16;shadow=1;shadowColor=#000000;shadowOffsetX=4;shadowOffsetY=4;shadowBlur=0;shadowOpacity=6;" mermaidBaseValue="FastAPI (Backend)" id="TpiaW6xQ_7IwXyguLgQe-8">
+          <mxCell parent="TpiaW6xQ_7IwXyguLgQe-1" style="html=1;shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;newEdgeStyle={&quot;edgeStyle&quot;:&quot;sequenceEdgeStyle&quot;,&quot;libavoidRouting&quot;:0,&quot;curved&quot;:0,&quot;rounded&quot;:0};lifelineDashed=0;strokeWidth=2;rounded=1;absoluteArcSize=1;arcSize=12;lifelineColor=#28253D;fillColor=#FFF7ED;strokeColor=#FB923C;fontColor=#28253D;size=73;lifelineMirror=1;fontFamily=Recursive;fontSize=16;shadow=1;shadowColor=#000000;shadowOffsetX=4;shadowOffsetY=4;shadowBlur=0;shadowOpacity=6;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRecursive;" vertex="1">
+            <mxGeometry height="1441" width="150" x="545" y="30" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="SQLite (Databáze)" mermaidId="n:DB" mermaidBaseStyle="html=1;shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;newEdgeStyle={&quot;edgeStyle&quot;:&quot;sequenceEdgeStyle&quot;,&quot;libavoidRouting&quot;:0,&quot;curved&quot;:0,&quot;rounded&quot;:0};lifelineDashed=0;strokeWidth=2;rounded=1;absoluteArcSize=1;arcSize=12;lifelineColor=#28253D;fillColor=#ECFEFF;strokeColor=#22D3EE;fontColor=#28253D;size=73;lifelineMirror=1;fontFamily=Recursive;fontSize=16;shadow=1;shadowColor=#000000;shadowOffsetX=4;shadowOffsetY=4;shadowBlur=0;shadowOpacity=6;" mermaidBaseValue="SQLite (Databáze)" id="TpiaW6xQ_7IwXyguLgQe-9">
+          <mxCell parent="TpiaW6xQ_7IwXyguLgQe-1" style="html=1;shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;newEdgeStyle={&quot;edgeStyle&quot;:&quot;sequenceEdgeStyle&quot;,&quot;libavoidRouting&quot;:0,&quot;curved&quot;:0,&quot;rounded&quot;:0};lifelineDashed=0;strokeWidth=2;rounded=1;absoluteArcSize=1;arcSize=12;lifelineColor=#28253D;fillColor=#ECFEFF;strokeColor=#22D3EE;fontColor=#28253D;size=73;lifelineMirror=1;fontFamily=Recursive;fontSize=16;shadow=1;shadowColor=#000000;shadowOffsetX=4;shadowOffsetY=4;shadowBlur=0;shadowOpacity=6;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRecursive;" vertex="1">
+            <mxGeometry height="1441" width="150" x="1017" y="30" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="loop" mermaidId="n:f3" mermaidBaseStyle="html=1;shape=umlFrame;dashed=1;fixDash=1;dashPattern=2 2;strokeWidth=2;pointerEvents=0;dropTarget=0;fillColor=#ffffff;strokeColor=#28253D;fontSize=16;align=center;verticalAlign=middle;fontFamily=Recursive;fontColor=#28253D;height=35;width=50;" mermaidBaseValue="loop" id="TpiaW6xQ_7IwXyguLgQe-10">
+          <mxCell parent="TpiaW6xQ_7IwXyguLgQe-1" style="html=1;shape=umlFrame;dashed=1;fixDash=1;dashPattern=2 2;strokeWidth=2;pointerEvents=0;dropTarget=0;fillColor=#ffffff;strokeColor=#28253D;fontSize=16;align=center;verticalAlign=middle;fontFamily=Recursive;fontColor=#28253D;height=35;width=50;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRecursive;" vertex="1">
+            <mxGeometry height="311" width="663" x="95" y="703" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <mxCell id="TpiaW6xQ_7IwXyguLgQe-11" parent="TpiaW6xQ_7IwXyguLgQe-10" style="text;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;fontSize=16;fontFamily=Recursive;fontColor=#28253D;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRecursive;" value="[Pro každé z 5 kol]" vertex="1">
+          <mxGeometry height="16" width="609" x="54" y="2" as="geometry" />
+        </mxCell>
+        <UserObject label="Přihlášení / Registrace" mermaidId="e:Client-&gt;Auth#0" mermaidBaseStyle="endArrow=block;endSize=9;verticalAlign=bottom;spacingBottom=2;edgeStyle=sequenceEdgeStyle;libavoidRouting=0;curved=0;rounded=0;fontSize=16;labelBackgroundColor=none;strokeWidth=1.5;strokeColor=#28253D;fontColor=#28253D;fontFamily=Recursive;" mermaidBaseValue="Přihlášení / Registrace" id="TpiaW6xQ_7IwXyguLgQe-12">
+          <mxCell edge="1" parent="TpiaW6xQ_7IwXyguLgQe-1" source="TpiaW6xQ_7IwXyguLgQe-6" style="endArrow=block;endSize=9;verticalAlign=bottom;spacingBottom=2;edgeStyle=sequenceEdgeStyle;libavoidRouting=0;curved=0;rounded=0;fontSize=16;labelBackgroundColor=none;strokeWidth=1.5;strokeColor=#28253D;fontColor=#28253D;fontFamily=Recursive;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRecursive;" target="TpiaW6xQ_7IwXyguLgQe-7">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="239" y="216" />
+              </Array>
+              <mxPoint x="105" y="216" as="sourcePoint" />
+              <mxPoint x="373" y="216" as="targetPoint" />
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <mxCell id="TpiaW6xQ_7IwXyguLgQe-13" parent="TpiaW6xQ_7IwXyguLgQe-1" style="ellipse;aspect=fixed;fillColor=#28253D;align=center;verticalAlign=middle;fontColor=#ffffff;fontSize=12;fontFamily=Recursive;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRecursive;" value="1" vertex="1">
+          <mxGeometry height="20" width="20" x="95" y="206" as="geometry" />
+        </mxCell>
+        <UserObject label="Vrátí podepsaný JWT Token" mermaidId="e:Auth-&gt;Client#0" mermaidBaseStyle="dashed=1;fixDash=1;dashPattern=3 3;endArrow=block;endSize=9;verticalAlign=bottom;spacingBottom=2;edgeStyle=sequenceEdgeStyle;libavoidRouting=0;curved=0;rounded=0;fontSize=16;labelBackgroundColor=none;strokeWidth=1.5;strokeColor=#28253D;fontColor=#28253D;fontFamily=Recursive;" mermaidBaseValue="Vrátí podepsaný JWT Token" id="TpiaW6xQ_7IwXyguLgQe-14">
+          <mxCell edge="1" parent="TpiaW6xQ_7IwXyguLgQe-1" source="TpiaW6xQ_7IwXyguLgQe-7" style="dashed=1;fixDash=1;dashPattern=3 3;endArrow=block;endSize=9;verticalAlign=bottom;spacingBottom=2;edgeStyle=sequenceEdgeStyle;libavoidRouting=0;curved=0;rounded=0;fontSize=16;labelBackgroundColor=none;strokeWidth=1.5;strokeColor=#28253D;fontColor=#28253D;fontFamily=Recursive;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRecursive;" target="TpiaW6xQ_7IwXyguLgQe-6">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="239" y="262" />
+              </Array>
+              <mxPoint x="373" y="262" as="sourcePoint" />
+              <mxPoint x="105" y="262" as="targetPoint" />
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <mxCell id="TpiaW6xQ_7IwXyguLgQe-15" parent="TpiaW6xQ_7IwXyguLgQe-1" style="ellipse;aspect=fixed;fillColor=#28253D;align=center;verticalAlign=middle;fontColor=#ffffff;fontSize=12;fontFamily=Recursive;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRecursive;" value="2" vertex="1">
+          <mxGeometry height="20" width="20" x="363" y="252" as="geometry" />
+        </mxCell>
+        <UserObject label="WSS: Připojení k místnosti (pošle JWT a kód)" mermaidId="e:Client-&gt;API#0" mermaidBaseStyle="endArrow=block;endSize=9;verticalAlign=bottom;spacingBottom=2;edgeStyle=sequenceEdgeStyle;libavoidRouting=0;curved=0;rounded=0;fontSize=16;labelBackgroundColor=none;strokeWidth=1.5;strokeColor=#28253D;fontColor=#28253D;fontFamily=Recursive;" mermaidBaseValue="WSS: Připojení k místnosti (pošle JWT a kód)" id="TpiaW6xQ_7IwXyguLgQe-16">
+          <mxCell edge="1" parent="TpiaW6xQ_7IwXyguLgQe-1" source="TpiaW6xQ_7IwXyguLgQe-6" style="endArrow=block;endSize=9;verticalAlign=bottom;spacingBottom=2;edgeStyle=sequenceEdgeStyle;libavoidRouting=0;curved=0;rounded=0;fontSize=16;labelBackgroundColor=none;strokeWidth=1.5;strokeColor=#28253D;fontColor=#28253D;fontFamily=Recursive;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRecursive;" target="TpiaW6xQ_7IwXyguLgQe-8">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="363" y="385" />
+              </Array>
+              <mxPoint x="105" y="385" as="sourcePoint" />
+              <mxPoint x="620" y="385" as="targetPoint" />
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <mxCell id="TpiaW6xQ_7IwXyguLgQe-17" parent="TpiaW6xQ_7IwXyguLgQe-1" style="ellipse;aspect=fixed;fillColor=#28253D;align=center;verticalAlign=middle;fontColor=#ffffff;fontSize=12;fontFamily=Recursive;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRecursive;" value="3" vertex="1">
+          <mxGeometry height="20" width="20" x="95" y="375" as="geometry" />
+        </mxCell>
+        <UserObject label="WSS: Úspěšně připojeno (přidělení role Host/Guest)" mermaidId="e:API-&gt;Client#0" mermaidBaseStyle="dashed=1;fixDash=1;dashPattern=3 3;endArrow=block;endSize=9;verticalAlign=bottom;spacingBottom=2;edgeStyle=sequenceEdgeStyle;libavoidRouting=0;curved=0;rounded=0;fontSize=16;labelBackgroundColor=none;strokeWidth=1.5;strokeColor=#28253D;fontColor=#28253D;fontFamily=Recursive;" mermaidBaseValue="WSS: Úspěšně připojeno (přidělení role Host/Guest)" id="TpiaW6xQ_7IwXyguLgQe-18">
+          <mxCell edge="1" parent="TpiaW6xQ_7IwXyguLgQe-1" source="TpiaW6xQ_7IwXyguLgQe-8" style="dashed=1;fixDash=1;dashPattern=3 3;endArrow=block;endSize=9;verticalAlign=bottom;spacingBottom=2;edgeStyle=sequenceEdgeStyle;libavoidRouting=0;curved=0;rounded=0;fontSize=16;labelBackgroundColor=none;strokeWidth=1.5;strokeColor=#28253D;fontColor=#28253D;fontFamily=Recursive;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRecursive;" target="TpiaW6xQ_7IwXyguLgQe-6">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="363" y="478" />
+              </Array>
+              <mxPoint x="620" y="478" as="sourcePoint" />
+              <mxPoint x="105" y="478" as="targetPoint" />
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <mxCell id="TpiaW6xQ_7IwXyguLgQe-19" parent="TpiaW6xQ_7IwXyguLgQe-1" style="ellipse;aspect=fixed;fillColor=#28253D;align=center;verticalAlign=middle;fontColor=#ffffff;fontSize=12;fontFamily=Recursive;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRecursive;" value="4" vertex="1">
+          <mxGeometry height="20" width="20" x="610" y="468" as="geometry" />
+        </mxCell>
+        <UserObject label="WSS: Host spouští hru (město: Praha, kola: 5)" mermaidId="e:Client-&gt;API#1" mermaidBaseStyle="endArrow=block;endSize=9;verticalAlign=bottom;spacingBottom=2;edgeStyle=sequenceEdgeStyle;libavoidRouting=0;curved=0;rounded=0;fontSize=16;labelBackgroundColor=none;strokeWidth=1.5;strokeColor=#28253D;fontColor=#28253D;fontFamily=Recursive;" mermaidBaseValue="WSS: Host spouští hru (město: Praha, kola: 5)" id="TpiaW6xQ_7IwXyguLgQe-20">
+          <mxCell edge="1" parent="TpiaW6xQ_7IwXyguLgQe-1" source="TpiaW6xQ_7IwXyguLgQe-6" style="endArrow=block;endSize=9;verticalAlign=bottom;spacingBottom=2;edgeStyle=sequenceEdgeStyle;libavoidRouting=0;curved=0;rounded=0;fontSize=16;labelBackgroundColor=none;strokeWidth=1.5;strokeColor=#28253D;fontColor=#28253D;fontFamily=Recursive;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRecursive;" target="TpiaW6xQ_7IwXyguLgQe-8">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="363" y="524" />
+              </Array>
+              <mxPoint x="105" y="524" as="sourcePoint" />
+              <mxPoint x="620" y="524" as="targetPoint" />
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <mxCell id="TpiaW6xQ_7IwXyguLgQe-21" parent="TpiaW6xQ_7IwXyguLgQe-1" style="ellipse;aspect=fixed;fillColor=#28253D;align=center;verticalAlign=middle;fontColor=#ffffff;fontSize=12;fontFamily=Recursive;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRecursive;" value="5" vertex="1">
+          <mxGeometry height="20" width="20" x="95" y="514" as="geometry" />
+        </mxCell>
+        <UserObject label="SELECT ubytovani ORDER BY RANDOM() LIMIT 5" mermaidId="e:API-&gt;DB#0" mermaidBaseStyle="endArrow=block;endSize=9;verticalAlign=bottom;spacingBottom=2;edgeStyle=sequenceEdgeStyle;libavoidRouting=0;curved=0;rounded=0;fontSize=16;labelBackgroundColor=none;strokeWidth=1.5;strokeColor=#28253D;fontColor=#28253D;fontFamily=Recursive;" mermaidBaseValue="SELECT ubytovani ORDER BY RANDOM() LIMIT 5" id="TpiaW6xQ_7IwXyguLgQe-22">
+          <mxCell edge="1" parent="TpiaW6xQ_7IwXyguLgQe-1" source="TpiaW6xQ_7IwXyguLgQe-8" style="endArrow=block;endSize=9;verticalAlign=bottom;spacingBottom=2;edgeStyle=sequenceEdgeStyle;libavoidRouting=0;curved=0;rounded=0;fontSize=16;labelBackgroundColor=none;strokeWidth=1.5;strokeColor=#28253D;fontColor=#28253D;fontFamily=Recursive;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRecursive;" target="TpiaW6xQ_7IwXyguLgQe-9">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="856" y="570" />
+              </Array>
+              <mxPoint x="620" y="570" as="sourcePoint" />
+              <mxPoint x="1092" y="570" as="targetPoint" />
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <mxCell id="TpiaW6xQ_7IwXyguLgQe-23" parent="TpiaW6xQ_7IwXyguLgQe-1" style="ellipse;aspect=fixed;fillColor=#28253D;align=center;verticalAlign=middle;fontColor=#ffffff;fontSize=12;fontFamily=Recursive;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRecursive;" value="6" vertex="1">
+          <mxGeometry height="20" width="20" x="610" y="560" as="geometry" />
+        </mxCell>
+        <UserObject label="Vrátí data (včetně reálné ceny a odkazů na R2 fotky)" mermaidId="e:DB-&gt;API#0" mermaidBaseStyle="dashed=1;fixDash=1;dashPattern=3 3;endArrow=block;endSize=9;verticalAlign=bottom;spacingBottom=2;edgeStyle=sequenceEdgeStyle;libavoidRouting=0;curved=0;rounded=0;fontSize=16;labelBackgroundColor=none;strokeWidth=1.5;strokeColor=#28253D;fontColor=#28253D;fontFamily=Recursive;" mermaidBaseValue="Vrátí data (včetně reálné ceny a odkazů na R2 fotky)" id="TpiaW6xQ_7IwXyguLgQe-24">
+          <mxCell edge="1" parent="TpiaW6xQ_7IwXyguLgQe-1" source="TpiaW6xQ_7IwXyguLgQe-9" style="dashed=1;fixDash=1;dashPattern=3 3;endArrow=block;endSize=9;verticalAlign=bottom;spacingBottom=2;edgeStyle=sequenceEdgeStyle;libavoidRouting=0;curved=0;rounded=0;fontSize=16;labelBackgroundColor=none;strokeWidth=1.5;strokeColor=#28253D;fontColor=#28253D;fontFamily=Recursive;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRecursive;" target="TpiaW6xQ_7IwXyguLgQe-8">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="856" y="616" />
+              </Array>
+              <mxPoint x="1092" y="616" as="sourcePoint" />
+              <mxPoint x="620" y="616" as="targetPoint" />
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <mxCell id="TpiaW6xQ_7IwXyguLgQe-25" parent="TpiaW6xQ_7IwXyguLgQe-1" style="ellipse;aspect=fixed;fillColor=#28253D;align=center;verticalAlign=middle;fontColor=#ffffff;fontSize=12;fontFamily=Recursive;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRecursive;" value="7" vertex="1">
+          <mxGeometry height="20" width="20" x="1082" y="606" as="geometry" />
+        </mxCell>
+        <UserObject label="WSS: Zobrazit byt (fotky, parametry - BEZ CENY)" mermaidId="e:API-&gt;Client#1" mermaidBaseStyle="dashed=1;fixDash=1;dashPattern=3 3;endArrow=block;endSize=9;verticalAlign=bottom;spacingBottom=2;edgeStyle=sequenceEdgeStyle;libavoidRouting=0;curved=0;rounded=0;fontSize=16;labelBackgroundColor=none;strokeWidth=1.5;strokeColor=#28253D;fontColor=#28253D;fontFamily=Recursive;" mermaidBaseValue="WSS: Zobrazit byt (fotky, parametry - BEZ CENY)" id="TpiaW6xQ_7IwXyguLgQe-26">
+          <mxCell edge="1" parent="TpiaW6xQ_7IwXyguLgQe-1" source="TpiaW6xQ_7IwXyguLgQe-8" style="dashed=1;fixDash=1;dashPattern=3 3;endArrow=block;endSize=9;verticalAlign=bottom;spacingBottom=2;edgeStyle=sequenceEdgeStyle;libavoidRouting=0;curved=0;rounded=0;fontSize=16;labelBackgroundColor=none;strokeWidth=1.5;strokeColor=#28253D;fontColor=#28253D;fontFamily=Recursive;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRecursive;" target="TpiaW6xQ_7IwXyguLgQe-6">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="363" y="784" />
+              </Array>
+              <mxPoint x="620" y="784" as="sourcePoint" />
+              <mxPoint x="105" y="784" as="targetPoint" />
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <mxCell id="TpiaW6xQ_7IwXyguLgQe-27" parent="TpiaW6xQ_7IwXyguLgQe-1" style="ellipse;aspect=fixed;fillColor=#28253D;align=center;verticalAlign=middle;fontColor=#ffffff;fontSize=12;fontFamily=Recursive;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRecursive;" value="8" vertex="1">
+          <mxGeometry height="20" width="20" x="610" y="774" as="geometry" />
+        </mxCell>
+        <UserObject label="WSS: Odeslat tip (např. 1500 Kč)" mermaidId="e:Client-&gt;API#2" mermaidBaseStyle="endArrow=block;endSize=9;verticalAlign=bottom;spacingBottom=2;edgeStyle=sequenceEdgeStyle;libavoidRouting=0;curved=0;rounded=0;fontSize=16;labelBackgroundColor=none;strokeWidth=1.5;strokeColor=#28253D;fontColor=#28253D;fontFamily=Recursive;" mermaidBaseValue="WSS: Odeslat tip (např. 1500 Kč)" id="TpiaW6xQ_7IwXyguLgQe-28">
+          <mxCell edge="1" parent="TpiaW6xQ_7IwXyguLgQe-1" source="TpiaW6xQ_7IwXyguLgQe-6" style="endArrow=block;endSize=9;verticalAlign=bottom;spacingBottom=2;edgeStyle=sequenceEdgeStyle;libavoidRouting=0;curved=0;rounded=0;fontSize=16;labelBackgroundColor=none;strokeWidth=1.5;strokeColor=#28253D;fontColor=#28253D;fontFamily=Recursive;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRecursive;" target="TpiaW6xQ_7IwXyguLgQe-8">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="363" y="830" />
+              </Array>
+              <mxPoint x="105" y="830" as="sourcePoint" />
+              <mxPoint x="620" y="830" as="targetPoint" />
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <mxCell id="TpiaW6xQ_7IwXyguLgQe-29" parent="TpiaW6xQ_7IwXyguLgQe-1" style="ellipse;aspect=fixed;fillColor=#28253D;align=center;verticalAlign=middle;fontColor=#ffffff;fontSize=12;fontFamily=Recursive;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRecursive;" value="9" vertex="1">
+          <mxGeometry height="20" width="20" x="95" y="820" as="geometry" />
+        </mxCell>
+        <UserObject label="WSS: Konec kola (vyhlášení reálné ceny a bodů)" mermaidId="e:API-&gt;Client#2" mermaidBaseStyle="dashed=1;fixDash=1;dashPattern=3 3;endArrow=block;endSize=9;verticalAlign=bottom;spacingBottom=2;edgeStyle=sequenceEdgeStyle;libavoidRouting=0;curved=0;rounded=0;fontSize=16;labelBackgroundColor=none;strokeWidth=1.5;strokeColor=#28253D;fontColor=#28253D;fontFamily=Recursive;" mermaidBaseValue="WSS: Konec kola (vyhlášení reálné ceny a bodů)" id="TpiaW6xQ_7IwXyguLgQe-30">
+          <mxCell edge="1" parent="TpiaW6xQ_7IwXyguLgQe-1" source="TpiaW6xQ_7IwXyguLgQe-8" style="dashed=1;fixDash=1;dashPattern=3 3;endArrow=block;endSize=9;verticalAlign=bottom;spacingBottom=2;edgeStyle=sequenceEdgeStyle;libavoidRouting=0;curved=0;rounded=0;fontSize=16;labelBackgroundColor=none;strokeWidth=1.5;strokeColor=#28253D;fontColor=#28253D;fontFamily=Recursive;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRecursive;" target="TpiaW6xQ_7IwXyguLgQe-6">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="363" y="1004" />
+              </Array>
+              <mxPoint x="620" y="1004" as="sourcePoint" />
+              <mxPoint x="105" y="1004" as="targetPoint" />
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <mxCell id="TpiaW6xQ_7IwXyguLgQe-31" parent="TpiaW6xQ_7IwXyguLgQe-1" style="ellipse;aspect=fixed;fillColor=#28253D;align=center;verticalAlign=middle;fontColor=#ffffff;fontSize=12;fontFamily=Recursive;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRecursive;" value="10" vertex="1">
+          <mxGeometry height="20" width="20" x="610" y="994" as="geometry" />
+        </mxCell>
+        <UserObject label="WSS: Konec hry (Zobrazení finálního žebříčku místnosti)" mermaidId="e:API-&gt;Client#3" mermaidBaseStyle="dashed=1;fixDash=1;dashPattern=3 3;endArrow=block;endSize=9;verticalAlign=bottom;spacingBottom=2;edgeStyle=sequenceEdgeStyle;libavoidRouting=0;curved=0;rounded=0;fontSize=16;labelBackgroundColor=none;strokeWidth=1.5;strokeColor=#28253D;fontColor=#28253D;fontFamily=Recursive;" mermaidBaseValue="WSS: Konec hry (Zobrazení finálního žebříčku místnosti)" id="TpiaW6xQ_7IwXyguLgQe-32">
+          <mxCell edge="1" parent="TpiaW6xQ_7IwXyguLgQe-1" source="TpiaW6xQ_7IwXyguLgQe-8" style="dashed=1;fixDash=1;dashPattern=3 3;endArrow=block;endSize=9;verticalAlign=bottom;spacingBottom=2;edgeStyle=sequenceEdgeStyle;libavoidRouting=0;curved=0;rounded=0;fontSize=16;labelBackgroundColor=none;strokeWidth=1.5;strokeColor=#28253D;fontColor=#28253D;fontFamily=Recursive;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRecursive;" target="TpiaW6xQ_7IwXyguLgQe-6">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="363" y="1137" />
+              </Array>
+              <mxPoint x="620" y="1137" as="sourcePoint" />
+              <mxPoint x="105" y="1137" as="targetPoint" />
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <mxCell id="TpiaW6xQ_7IwXyguLgQe-33" parent="TpiaW6xQ_7IwXyguLgQe-1" style="ellipse;aspect=fixed;fillColor=#28253D;align=center;verticalAlign=middle;fontColor=#ffffff;fontSize=12;fontFamily=Recursive;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRecursive;" value="11" vertex="1">
+          <mxGeometry height="20" width="20" x="610" y="1127" as="geometry" />
+        </mxCell>
+        <UserObject label="UPDATE users SET global_score = global_score + body" mermaidId="e:API-&gt;DB#1" mermaidBaseStyle="endArrow=block;endSize=9;verticalAlign=bottom;spacingBottom=2;edgeStyle=sequenceEdgeStyle;libavoidRouting=0;curved=0;rounded=0;fontSize=16;labelBackgroundColor=none;strokeWidth=1.5;strokeColor=#28253D;fontColor=#28253D;fontFamily=Recursive;" mermaidBaseValue="UPDATE users SET global_score = global_score + body" id="TpiaW6xQ_7IwXyguLgQe-34">
+          <mxCell edge="1" parent="TpiaW6xQ_7IwXyguLgQe-1" source="TpiaW6xQ_7IwXyguLgQe-8" style="endArrow=block;endSize=9;verticalAlign=bottom;spacingBottom=2;edgeStyle=sequenceEdgeStyle;libavoidRouting=0;curved=0;rounded=0;fontSize=16;labelBackgroundColor=none;strokeWidth=1.5;strokeColor=#28253D;fontColor=#28253D;fontFamily=Recursive;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRecursive;" target="TpiaW6xQ_7IwXyguLgQe-9">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="856" y="1230" />
+              </Array>
+              <mxPoint x="620" y="1230" as="sourcePoint" />
+              <mxPoint x="1092" y="1230" as="targetPoint" />
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <mxCell id="TpiaW6xQ_7IwXyguLgQe-35" parent="TpiaW6xQ_7IwXyguLgQe-1" style="ellipse;aspect=fixed;fillColor=#28253D;align=center;verticalAlign=middle;fontColor=#ffffff;fontSize=12;fontFamily=Recursive;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRecursive;" value="12" vertex="1">
+          <mxGeometry height="20" width="20" x="610" y="1220" as="geometry" />
+        </mxCell>
+        <UserObject label="Potvrzení zápisu" mermaidId="e:DB-&gt;API#1" mermaidBaseStyle="dashed=1;fixDash=1;dashPattern=3 3;endArrow=block;endSize=9;verticalAlign=bottom;spacingBottom=2;edgeStyle=sequenceEdgeStyle;libavoidRouting=0;curved=0;rounded=0;fontSize=16;labelBackgroundColor=none;strokeWidth=1.5;strokeColor=#28253D;fontColor=#28253D;fontFamily=Recursive;" mermaidBaseValue="Potvrzení zápisu" id="TpiaW6xQ_7IwXyguLgQe-36">
+          <mxCell edge="1" parent="TpiaW6xQ_7IwXyguLgQe-1" source="TpiaW6xQ_7IwXyguLgQe-9" style="dashed=1;fixDash=1;dashPattern=3 3;endArrow=block;endSize=9;verticalAlign=bottom;spacingBottom=2;edgeStyle=sequenceEdgeStyle;libavoidRouting=0;curved=0;rounded=0;fontSize=16;labelBackgroundColor=none;strokeWidth=1.5;strokeColor=#28253D;fontColor=#28253D;fontFamily=Recursive;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRecursive;" target="TpiaW6xQ_7IwXyguLgQe-8">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="856" y="1276" />
+              </Array>
+              <mxPoint x="1092" y="1276" as="sourcePoint" />
+              <mxPoint x="620" y="1276" as="targetPoint" />
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <mxCell id="TpiaW6xQ_7IwXyguLgQe-37" parent="TpiaW6xQ_7IwXyguLgQe-1" style="ellipse;aspect=fixed;fillColor=#28253D;align=center;verticalAlign=middle;fontColor=#ffffff;fontSize=12;fontFamily=Recursive;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRecursive;" value="13" vertex="1">
+          <mxGeometry height="20" width="20" x="1082" y="1266" as="geometry" />
+        </mxCell>
+        <UserObject label="WSS: Host kliká na &quot;Hrát znovu&quot;" mermaidId="e:Client-&gt;API#3" mermaidBaseStyle="endArrow=block;endSize=9;verticalAlign=bottom;spacingBottom=2;edgeStyle=sequenceEdgeStyle;libavoidRouting=0;curved=0;rounded=0;fontSize=16;labelBackgroundColor=none;strokeWidth=1.5;strokeColor=#28253D;fontColor=#28253D;fontFamily=Recursive;" mermaidBaseValue="WSS: Host kliká na &quot;Hrát znovu&quot;" id="TpiaW6xQ_7IwXyguLgQe-38">
+          <mxCell edge="1" parent="TpiaW6xQ_7IwXyguLgQe-1" source="TpiaW6xQ_7IwXyguLgQe-6" style="endArrow=block;endSize=9;verticalAlign=bottom;spacingBottom=2;edgeStyle=sequenceEdgeStyle;libavoidRouting=0;curved=0;rounded=0;fontSize=16;labelBackgroundColor=none;strokeWidth=1.5;strokeColor=#28253D;fontColor=#28253D;fontFamily=Recursive;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRecursive;" target="TpiaW6xQ_7IwXyguLgQe-8">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="363" y="1322" />
+              </Array>
+              <mxPoint x="105" y="1322" as="sourcePoint" />
+              <mxPoint x="620" y="1322" as="targetPoint" />
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <mxCell id="TpiaW6xQ_7IwXyguLgQe-39" parent="TpiaW6xQ_7IwXyguLgQe-1" style="ellipse;aspect=fixed;fillColor=#28253D;align=center;verticalAlign=middle;fontColor=#ffffff;fontSize=12;fontFamily=Recursive;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRecursive;" value="14" vertex="1">
+          <mxGeometry height="20" width="20" x="95" y="1312" as="geometry" />
+        </mxCell>
+        <UserObject label="WSS: Reset místnosti do stavu Lobby" mermaidId="e:API-&gt;Client#4" mermaidBaseStyle="dashed=1;fixDash=1;dashPattern=3 3;endArrow=block;endSize=9;verticalAlign=bottom;spacingBottom=2;edgeStyle=sequenceEdgeStyle;libavoidRouting=0;curved=0;rounded=0;fontSize=16;labelBackgroundColor=none;strokeWidth=1.5;strokeColor=#28253D;fontColor=#28253D;fontFamily=Recursive;" mermaidBaseValue="WSS: Reset místnosti do stavu Lobby" id="TpiaW6xQ_7IwXyguLgQe-40">
+          <mxCell edge="1" parent="TpiaW6xQ_7IwXyguLgQe-1" source="TpiaW6xQ_7IwXyguLgQe-8" style="dashed=1;fixDash=1;dashPattern=3 3;endArrow=block;endSize=9;verticalAlign=bottom;spacingBottom=2;edgeStyle=sequenceEdgeStyle;libavoidRouting=0;curved=0;rounded=0;fontSize=16;labelBackgroundColor=none;strokeWidth=1.5;strokeColor=#28253D;fontColor=#28253D;fontFamily=Recursive;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRecursive;" target="TpiaW6xQ_7IwXyguLgQe-6">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="363" y="1368" />
+              </Array>
+              <mxPoint x="620" y="1368" as="sourcePoint" />
+              <mxPoint x="105" y="1368" as="targetPoint" />
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <mxCell id="TpiaW6xQ_7IwXyguLgQe-41" parent="TpiaW6xQ_7IwXyguLgQe-1" style="ellipse;aspect=fixed;fillColor=#28253D;align=center;verticalAlign=middle;fontColor=#ffffff;fontSize=12;fontFamily=Recursive;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRecursive;" value="15" vertex="1">
+          <mxGeometry height="20" width="20" x="610" y="1358" as="geometry" />
+        </mxCell>
+        <UserObject label="Fáze 1: Autentizace" mermaidId="n:note0" mermaidBaseStyle="html=1;fillColor=#fff5ad;strokeColor=#FACC15;fontColor=#28253D;fontFamily=Recursive;fontSize=16;" mermaidBaseValue="Fáze 1: Autentizace" id="TpiaW6xQ_7IwXyguLgQe-42">
+          <mxCell parent="TpiaW6xQ_7IwXyguLgQe-1" style="html=1;fillColor=#fff5ad;strokeColor=#FACC15;fontColor=#28253D;fontFamily=Recursive;fontSize=16;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRecursive;" vertex="1">
+            <mxGeometry height="37" width="157" x="130" y="133" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Fáze 2: Lobby (WebSockets)" mermaidId="n:note1" mermaidBaseStyle="html=1;fillColor=#fff5ad;strokeColor=#FACC15;fontColor=#28253D;fontFamily=Recursive;fontSize=16;" mermaidBaseValue="Fáze 2: Lobby (WebSockets)" id="TpiaW6xQ_7IwXyguLgQe-43">
+          <mxCell parent="TpiaW6xQ_7IwXyguLgQe-1" style="html=1;fillColor=#fff5ad;strokeColor=#FACC15;fontColor=#28253D;fontFamily=Recursive;fontSize=16;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRecursive;" vertex="1">
+            <mxGeometry height="37" width="221" x="130" y="302" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Validace JWT (ověření Auth0 podpisu)" mermaidId="n:note2" mermaidBaseStyle="html=1;fillColor=#fff5ad;strokeColor=#FACC15;fontColor=#28253D;fontFamily=Recursive;fontSize=16;" mermaidBaseValue="Validace JWT (ověření Auth0 podpisu)" id="TpiaW6xQ_7IwXyguLgQe-44">
+          <mxCell parent="TpiaW6xQ_7IwXyguLgQe-1" style="html=1;fillColor=#fff5ad;strokeColor=#FACC15;fontColor=#28253D;fontFamily=Recursive;fontSize=16;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRecursive;" vertex="1">
+            <mxGeometry height="37" width="297" x="472" y="395" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Fáze 3: Herní smyčka (opakuje se pro každé kolo)" mermaidId="n:note3" mermaidBaseStyle="html=1;fillColor=#fff5ad;strokeColor=#FACC15;fontColor=#28253D;fontFamily=Recursive;fontSize=16;" mermaidBaseValue="Fáze 3: Herní smyčka (opakuje se pro každé kolo)" id="TpiaW6xQ_7IwXyguLgQe-45">
+          <mxCell parent="TpiaW6xQ_7IwXyguLgQe-1" style="html=1;fillColor=#fff5ad;strokeColor=#FACC15;fontColor=#28253D;fontFamily=Recursive;fontSize=16;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRecursive;" vertex="1">
+            <mxGeometry height="37" width="387" x="130" y="656" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Čekání na tipy všech hráčů&lt;br&gt;nebo vypršení limitu" mermaidId="n:note4" mermaidBaseStyle="html=1;fillColor=#fff5ad;strokeColor=#FACC15;fontColor=#28253D;fontFamily=Recursive;fontSize=16;" mermaidBaseValue="Čekání na tipy všech hráčů&#xa;nebo vypršení 30s limitu" id="TpiaW6xQ_7IwXyguLgQe-46">
+          <mxCell parent="TpiaW6xQ_7IwXyguLgQe-1" style="html=1;fillColor=#fff5ad;strokeColor=#FACC15;fontColor=#28253D;fontFamily=Recursive;fontSize=16;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRecursive;" vertex="1">
+            <mxGeometry height="54" width="209" x="516" y="840" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Výpočet procentuální odchylky&lt;br&gt;a přidělení bodů" mermaidId="n:note5" mermaidBaseStyle="html=1;fillColor=#fff5ad;strokeColor=#FACC15;fontColor=#28253D;fontFamily=Recursive;fontSize=16;" mermaidBaseValue="Výpočet procentuální odchylky&#xa;a přidělení bodů (abs/real * 100)" id="TpiaW6xQ_7IwXyguLgQe-47">
+          <mxCell parent="TpiaW6xQ_7IwXyguLgQe-1" style="html=1;fillColor=#fff5ad;strokeColor=#FACC15;fontColor=#28253D;fontFamily=Recursive;fontSize=16;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRecursive;" vertex="1">
+            <mxGeometry height="54" width="256" x="492" y="904" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Fáze 4: Vyhodnocení" mermaidId="n:note6" mermaidBaseStyle="html=1;fillColor=#fff5ad;strokeColor=#FACC15;fontColor=#28253D;fontFamily=Recursive;fontSize=16;" mermaidBaseValue="Fáze 4: Vyhodnocení" id="TpiaW6xQ_7IwXyguLgQe-48">
+          <mxCell parent="TpiaW6xQ_7IwXyguLgQe-1" style="html=1;fillColor=#fff5ad;strokeColor=#FACC15;fontColor=#28253D;fontFamily=Recursive;fontSize=16;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRecursive;" vertex="1">
+            <mxGeometry height="37" width="162" x="130" y="1054" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Filtrace pouze registrovaných hráčů (Auth0 ID)" mermaidId="n:note7" mermaidBaseStyle="html=1;fillColor=#fff5ad;strokeColor=#FACC15;fontColor=#28253D;fontFamily=Recursive;fontSize=16;" mermaidBaseValue="Filtrace pouze registrovaných hráčů (Auth0 ID)" id="TpiaW6xQ_7IwXyguLgQe-49">
+          <mxCell parent="TpiaW6xQ_7IwXyguLgQe-1" style="html=1;fillColor=#fff5ad;strokeColor=#FACC15;fontColor=#28253D;fontFamily=Recursive;fontSize=16;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRecursive;" vertex="1">
+            <mxGeometry height="37" width="370" x="435" y="1147" as="geometry" />
+          </mxCell>
+        </UserObject>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
