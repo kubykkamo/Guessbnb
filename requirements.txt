@@ -1,3 +1,5 @@
 # Runtime dependencies for src/models + src/repositories
 pydantic>=2,<3
 aiosqlite>=0.20
+requests>=2.34.2
+boto3>=1.34

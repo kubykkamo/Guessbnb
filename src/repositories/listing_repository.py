@@ -7,15 +7,24 @@ from src.models import Listing, ListingCreate
 
 async def create_listing(conn: aiosqlite.Connection, data: ListingCreate) -> Listing:
     cursor = await conn.execute(
-        "INSERT INTO listings (external_id, city, name, property_type, accommodates,"
-        " bedrooms, rating, reviews_count, price) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        "INSERT INTO listings (external_id, city, country, neighbourhood, latitude,"
+        " longitude, name, property_type, room_type, accommodates, bedrooms, beds,"
+        " bathrooms, rating, reviews_count, price)"
+        " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
         (
             data.external_id,
             data.city,
+            data.country,
+            data.neighbourhood,
+            data.latitude,
+            data.longitude,
             data.name,
             data.property_type,
+            data.room_type,
             data.accommodates,
             data.bedrooms,
+            data.beds,
+            data.bathrooms,
             data.rating,
             data.reviews_count,
             data.price,
@@ -41,15 +50,24 @@ async def list_listings(conn: aiosqlite.Connection, limit: int = 100, offset: in
 
 async def update_listing(conn: aiosqlite.Connection, listing: Listing) -> Listing | None:
     await conn.execute(
-        "UPDATE listings SET external_id = ?, city = ?, name = ?, property_type = ?,"
-        " accommodates = ?, bedrooms = ?, rating = ?, reviews_count = ?, price = ? WHERE id = ?",
+        "UPDATE listings SET external_id = ?, city = ?, country = ?, neighbourhood = ?,"
+        " latitude = ?, longitude = ?, name = ?, property_type = ?, room_type = ?,"
+        " accommodates = ?, bedrooms = ?, beds = ?, bathrooms = ?, rating = ?,"
+        " reviews_count = ?, price = ? WHERE id = ?",
         (
             listing.external_id,
             listing.city,
+            listing.country,
+            listing.neighbourhood,
+            listing.latitude,
+            listing.longitude,
             listing.name,
             listing.property_type,
+            listing.room_type,
             listing.accommodates,
             listing.bedrooms,
+            listing.beds,
+            listing.bathrooms,
             listing.rating,
             listing.reviews_count,
             listing.price,
