@@ -48,6 +48,13 @@ async def list_listings(conn: aiosqlite.Connection, limit: int = 100, offset: in
     return [Listing(**dict(row)) for row in rows]
 
 
+async def list_cities(conn: aiosqlite.Connection) -> list[str]:
+    """Města, ve kterých máme naimportovaná ubytování. Seřazená, ať se selector v UI nepřestavuje."""
+    cursor = await conn.execute("SELECT DISTINCT city FROM listings ORDER BY city")
+    rows = await cursor.fetchall()
+    return [row["city"] for row in rows]
+
+
 async def update_listing(conn: aiosqlite.Connection, listing: Listing) -> Listing | None:
     await conn.execute(
         "UPDATE listings SET external_id = ?, city = ?, country = ?, neighbourhood = ?,"
