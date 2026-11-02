@@ -1,4 +1,4 @@
-"""PHOTOS table - odkazy na fotky v S3/R2, nikdy ne data fotek."""
+"""PHOTOS table - links to photos in S3/R2, never the photo data."""
 
 from pydantic import BaseModel, Field
 

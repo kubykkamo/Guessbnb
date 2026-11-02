@@ -1,4 +1,4 @@
-"""CRUD nad tabulkou listings."""
+"""CRUD for the listings table."""
 
 import aiosqlite
 
@@ -49,7 +49,7 @@ async def list_listings(conn: aiosqlite.Connection, limit: int = 100, offset: in
 
 
 async def list_cities(conn: aiosqlite.Connection) -> list[str]:
-    """Města, ve kterých máme naimportovaná ubytování. Seřazená, ať se selector v UI nepřestavuje."""
+    """Cities in which we have imported listings."""
     cursor = await conn.execute("SELECT DISTINCT city FROM listings ORDER BY city")
     rows = await cursor.fetchall()
     return [row["city"] for row in rows]

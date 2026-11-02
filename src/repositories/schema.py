@@ -1,21 +1,23 @@
-"""DDL podle ERD (docs/ERD.drawio). Spouští se v db.connect().
+"""DDL according to the ERD (docs/ERD.drawio). Runs in db.connect().
 
-Přidaný sloupec se do už existující databáze sám nedostane – každá tabulka je
-tady jen CREATE TABLE IF NOT EXISTS, takže na tu rozdělanou schema nedosáhne, a
-INSERT na nový sloupec pak narazí s „table listings has no column named …“.
+An added column does not get into an already existing database by itself - every
+table here is only CREATE TABLE IF NOT EXISTS, so it does not reach the half-done
+schema, and an INSERT into the new column then hits "table listings has no column
+named ...".
 
-Sloupec, který má pro všechny stávající řádky tu samou hodnotu, stačí přidat
-jednou ručně – u `country` se to běželo takhle:
+A column that has the same value for all existing rows is enough to add by hand
+once - for `country` it ran like this:
 
     ALTER TABLE listings ADD COLUMN country TEXT NOT NULL DEFAULT 'Czechia';
 
-SQLite u přidaného sloupce dovolí NOT NULL jen s výchozí hodnotou – a ta se
-okamžitě doplní i do existujících řádků, takže žádný UPDATE není potřeba.
-Výsledek se od čerstvě založené DB liší jen okrasně: sloupec je až nakonec a
-nese tu DEFAULT. Do toho nic nemluví, model i scraper dávají `country` vždycky.
+SQLite allows NOT NULL on an added column only with a default value - and that one
+gets filled into the existing rows immediately, so no UPDATE is needed. The result
+differs from a freshly created DB only decoratively: the column is only at the end
+and carries that DEFAULT. Nothing speaks against it, the model and the scraper both
+give `country` always.
 
-Všechno ostatní (přejmenování, typ, CHECK) se takhle nedá – smaž
-data/guessbnb.db a spusť scraper znovu, README „Reset úplně ze všeho“.
+Everything else (renaming, type, CHECK) cannot be done this way - delete
+data/guessbnb.db and run the scraper again, README "Reset completely from everything".
 """
 
 SCHEMA = """

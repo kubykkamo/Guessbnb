@@ -1,4 +1,4 @@
-"""USERS table. Hesla se neukládají, identita jde přes Auth0 ID."""
+"""USERS table. Passwords are not stored, identity goes through the Auth0 ID."""
 
 from datetime import datetime
 

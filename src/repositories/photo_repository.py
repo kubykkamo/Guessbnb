@@ -1,4 +1,4 @@
-"""CRUD nad tabulkou photos."""
+"""CRUD for the photos table."""
 
 import aiosqlite
 

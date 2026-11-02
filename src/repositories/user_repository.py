@@ -1,4 +1,4 @@
-"""CRUD nad tabulkou users. Každý zápis skončí commit(), nic víc."""
+"""CRUD for the users table. Every write ends with commit(), nothing more."""
 
 import aiosqlite
 

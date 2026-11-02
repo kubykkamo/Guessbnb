@@ -1,12 +1,12 @@
-"""ETL pipeline: listings.csv -> fotky z Airbnb -> R2 -> SQLite.
+"""ETL pipeline: listings.csv -> photos from Airbnb -> R2 -> SQLite.
 
-Spusteni:  python scraper.py
-Test jedne stranky (jen vypise fotky, nic neuklada):
+Run:  python scraper.py
+Test of one page (only prints the photos, saves nothing):
          python scraper.py test https://www.airbnb.com/rooms/1571705115265609740
 
-Fotka leti z Airbnb do pameti a odtud primo do R2, takze na disku nic nesedi
-(SAVE_LOCAL = True ji navyse ponecha ve photos/). Do databaze se uklada adresa
-<R2_PUBLIC_BASE>/<external_id>/<poradi>.<ext>.
+The photo flies from Airbnb into memory and from there straight into R2, so nothing
+sits on disk (SAVE_LOCAL = True additionally keeps it in photos/). The database
+stores the address <R2_PUBLIC_BASE>/<external_id>/<order>.<ext>.
 """
 
 import csv
@@ -26,45 +26,47 @@ from src.models import ListingCreate
 from src.repositories.db import DB_PATH
 from src.repositories.schema import SCHEMA
 
-# Jmena ubytovani v CSV obsahuji hvezdicky a emoji, windows konzole by na nich
-# skocila s UnicodeEncodeError uprostred celeho behu.
+# Listing names in the CSV contain asterisks and emoji, the windows console would
+# crash on them with UnicodeEncodeError in the middle of the whole run.
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
-# --- nastaveni -------------------------------------------------------------
-LISTINGS_CSV = "listings.csv"     # sem dej cestu ke svemu listings.csv
-SAVE_LOCAL = False                # True = fotku zarad ponechat i na disku
-PHOTO_DIR = "photos"              # slozka jen pro SAVE_LOCAL = True
-CITY = "Berlin"                    # sloupec city v CSV neni, hrajeme za toto
-COUNTRY = "Germany"                # sloupec country v CSV take neni
-# Měna, ve které je sloupec price v LISTINGS_CSV. Do DB vždy letí koruny, takže
-# to musí být deklarované – symbol v řetězci se na to spolehnout nedá (Praha má
-# před korunami znak $). Přidat další město stojí dva řádky níže, ne nové schéma.
-CSV_CURRENCY = "EUR"               # "CZK" = přečti jak je, "USD" = přepočítej
+# --- settings --------------------------------------------------------------
+LISTINGS_CSV = "listings.csv"     # put the path to your listings.csv here
+SAVE_LOCAL = False                # True = keep the photo on the disk too
+PHOTO_DIR = "photos"              # folder only for SAVE_LOCAL = True
+CITY = "Berlin"                    # there is no city column in the CSV, we play as this one
+COUNTRY = "Germany"                # there is no country column in the CSV either
+# Currency in which the price column of LISTINGS_CSV is. To the DB always go crowns,
+# so it has to be declared - the symbol in the string cannot be relied on (Prague
+# has the $ sign in front of the crowns). Adding another city costs two lines below,
+# not a new schema.
+CSV_CURRENCY = "EUR"               # "CZK" = read as is, "USD" = convert
 USD_TO_CZK = 23.1
 EUR_TO_CZK = 24.36
-GBP_TO_CZK = 29.22             # platí jen pro CSV_CURRENCY = "USD"
-RATE_DATE = "2026-10-31"           # kdy byl kurz pořízen, ať tu nevisí bez data
-MAX_PHOTOS = 8                    # max fotek na jedno ubytovani
-LIMIT = 500                    # 0 = všech 11 804 radku, jinak počet ubytování
-SAMPLE_SEED = 1           # cislo = stale ten samy nahodny vyber (obnova behu)
-DRY_RUN = False                # True = jen stahuje fotky, nepise do DB ani R2
-IM_WIDTH = 1200                   # a0.muscache.com umi mensi verze teze fotky
-LISTING_DELAY = 2.0               # pauza mezi ubytovanimi (sekundy)
-PHOTO_DELAY = 0.5                 # pauza mezi fotkami uvnitr jednoho ubytovani
+GBP_TO_CZK = 29.22             # valid only for CSV_CURRENCY = "USD"
+RATE_DATE = "2026-10-31"           # when the rate was taken, so it does not hang here without a date
+MAX_PHOTOS = 8                    # max photos for one listing
+LIMIT = 500                    # 0 = all of the 11 804 rows, otherwise number of listings
+SAMPLE_SEED = 1           # number = always the same random selection (resuming a run)
+DRY_RUN = False                # True = only downloads photos, does not write to DB or R2
+IM_WIDTH = 1200                   # a0.muscache.com can do smaller versions of the same photo
+LISTING_DELAY = 2.0               # pause between listings (seconds)
+PHOTO_DELAY = 0.5                 # pause between photos inside one listing
 
 # --- Cloudflare R2 ---------------------------------------------------------
-# Verejnou adresu kbeliku ukladame do databaze. Kdybys prechazel na vlastni
-# domenu, meni se to jen tady a v databazi staci prepsat stary zaklad na novy.
+# We store the public address of the bucket in the database. If you switch to your
+# own domain, it changes only here and in the database it is enough to rewrite the
+# old base to the new one.
 R2_PUBLIC_BASE = "https://pub-7001b7da379a442383fc98f61774c56b.r2.dev"
 R2_BUCKET = "guessbnb"
 R2_ENDPOINT = "https://c47dc1ff421395fa0cf45bdb140b1d13.r2.cloudflarestorage.com"
-# S3 nema adresare, jen klice - "slozka", kterou ukazuje konzole, je cokoliv
-# pred lomitkem. Fotky tudiz lezi pod prefixem Prague/<external_id>/<poradi>.
+# S3 has no directories, only keys - the "folder" the console shows is anything
+# before a slash. The photos therefore lie under the prefix Prague/<external_id>/<order>.
 R2_PREFIX = CITY
 R2_ACCESS_KEY = os.environ.get("R2_ACCESS_KEY_ID", "")
 R2_SECRET_KEY = os.environ.get("R2_SECRET_ACCESS_KEY", "")
 
-# --- stahovani stranky -----------------------------------------------------
+# --- page download ---------------------------------------------------------
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
                   "(KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
@@ -72,17 +74,18 @@ HEADERS = {
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
 }
 
-# Dva tvary fotek ubytovani:
-#   .../im/pictures/hosting/Hosting-<id>/original/<uuid>.jpeg   (nové)
-#   .../im/pictures/miso/Hosting-<id>/original/<uuid>.jpeg      (nove, druhy folder)
-#   .../im/pictures/<uuid>.jpg                                  (starsi)
-# Slozka mezi pictures a Hosting- muze byt jaka chce. Stary tvar nema slozku
-# zadnou - a prave to ho oddeluje od fotek hostitele a ikon Airbnb, protoze
-# UserProfile, AirbnbPlatformAssets i user/ VZDY maji aspon jednu slozku, takze
-# do zadne z vetveni nikdy nespadnou.
-# POZOR: cislo za Hosting- neni id ubytovani, ale id foto sady. Stranka
-# ubytovani muze bez presmerovani nest fotky pod jinym cislem a muze v nich byt
-# i blok "podobne ubytovani", takze se podle id nic nefiltruje.
+# Two shapes of listing photos:
+#   .../im/pictures/hosting/Hosting-<id>/original/<uuid>.jpeg   (new)
+#   .../im/pictures/miso/Hosting-<id>/original/<uuid>.jpeg      (new, second folder)
+#   .../im/pictures/<uuid>.jpg                                  (older)
+# The folder between pictures and Hosting- can be anything. The old shape has no
+# folder at all - and that is exactly what separates it from host photos and Airbnb
+# icons, because UserProfile, AirbnbPlatformAssets and user/ ALWAYS have at least
+# one folder, so they never fall into either branch.
+# WARNING: the number after Hosting- is not the listing id, it is the id of the
+# photo set. The listing page can carry photos under a different number without a
+# redirect and there can be a "similar listings" block among them, so nothing is
+# filtered by id.
 PHOTO_URL_RE = re.compile(
     r"https://a0\.muscache\.com/im/pictures/"
     r"(?:(?:[a-z]+/)?Hosting-\d+/original/[0-9a-fA-F-]+|[0-9a-fA-F-]{20,})"
@@ -91,31 +94,31 @@ PHOTO_URL_RE = re.compile(
 
 
 def extract_photo_urls(html):
-    """Fotky ubytovani bez duplicit, v poradi, ve kterem je nabizi hostitel."""
-    # JSON uvnitr <script> escapuje lomitka, tak je sjednotime na normalni /
+    """Listing photos without duplicates, in the order in which the host offers them."""
+    # JSON inside <script> escapes slashes, so we unify them to a normal /
     text = html.replace(r"\\/", "/").replace(r"\/", "/")
     return list(dict.fromkeys(PHOTO_URL_RE.findall(text)))
 
 
 def normalize(url):
-    """Sjednoti adresu na tvar, ktery CDN umi zmenSit.
+    """Unifies the address to the shape the CDN can resize.
 
-    CSV pouziva a0.muscache.com/pictures/... a stranka /im/pictures/... - to
-    iste, jen ta druha cesta se preprocessuje. Bez /im by se stahoval original
-    (1,8 MB misto 150 kB) a fotka by se nevypadala jako ty ze stranky, takze by
-    se ani neodfiltrovala jako duplikat.
+    The CSV uses a0.muscache.com/pictures/... and the page /im/pictures/... - the
+    same thing, only the second path gets preprocessed. Without /im the original
+    would download (1.8 MB instead of 150 kB) and the photo would not look like the
+    ones from the page, so it would not even get filtered out as a duplicate.
     """
     url = (url or "").split("?")[0]
     return url.replace("muscache.com/pictures/", "muscache.com/im/pictures/")
 
 
 def sized(url):
-    """Pida rozlisovaci parametr CDN, at stahujeme ~150 kB misto ~210 kB."""
+    """Adds the CDN resolution parameter so we download ~150 kB instead of ~210 kB."""
     return url if "?" in url else f"{url}?im_w={IM_WIDTH}"
 
 
 def fetch_page(session, url):
-    """HTML stranky ubytovani, prazdny retezek kdyz stranka nejde."""
+    """HTML of the listing page, empty string when the page does not work."""
     try:
         response = session.get(url, timeout=20)
         if response.status_code != 200:
@@ -128,7 +131,7 @@ def fetch_page(session, url):
 
 
 def gallery_urls(session, listing_url, csv_picture_url, count):
-    """Fotky ze stranky, doplnene o fotku z CSV, ktera vzdy dostane poradí 1."""
+    """Photos from the page, filled in with the photo from the CSV, which always gets order 1."""
     urls = [normalize(u) for u in extract_photo_urls(fetch_page(session, listing_url))] if listing_url else []
     first = normalize(csv_picture_url)
     if first:
@@ -138,7 +141,7 @@ def gallery_urls(session, listing_url, csv_picture_url, count):
 
 
 def download(session, url):
-    """Bytes fotky, nebo None kdyz se nestahne."""
+    """Photo bytes, or None when it does not download."""
     try:
         response = session.get(sized(url), timeout=30)
         if response.status_code != 200 or not response.content:
@@ -150,7 +153,7 @@ def download(session, url):
         return None
 
 
-# --- CSV radek -> model ----------------------------------------------------
+# --- CSV row -> model ------------------------------------------------------
 def to_int(raw):
     try:
         return int(float(str(raw).strip()))
@@ -166,19 +169,22 @@ def to_float(raw):
 
 
 def clip(text, limit):
-    """Text na delku sloupce. Airbnb obcas da jmeno delsi nez 200 znaku a to
-    pydantic odmitne - kratsi jmeno nestoji nic, zahozena davka ano."""
+    """Text to the length of the column. Airbnb sometimes gives a name longer than
+    200 characters and pydantic refuses that - a shorter name costs nothing, a
+    discarded batch does."""
     return text.strip()[:limit]
 
 
 def czk_multiplier():
-    """Násobek, který z ceny v CSV udělá koruny.
+    """Multiplier that turns the price in the CSV into crowns.
 
-    Neznámá měna znamená, že jsme si s CSV nerozuměli – hádat tady není co,
-    protože špatný převod by se v datech tvářil jako opravdu drahé ubytování.
+    An unknown currency means we did not understand each other with the CSV - there
+    is nothing to guess here, because a wrong conversion would look in the data like
+    a really expensive listing.
 
-    Kurz je pevný a s datem: CSV samo je ceník pro jedno budoucí okno (tohle
-    CSV cituje 2027-09-16), takže denní kurz by byl přesnost, kterou data nemají.
+    The rate is fixed and with a date: the CSV itself is a price list for one future
+    window (this CSV quotes 2027-09-16), so a daily rate would be a precision the
+    data do not have.
     """
     if CSV_CURRENCY == "CZK":
         return 1.0
@@ -195,9 +201,10 @@ def czk_multiplier():
 
 
 def parse_price(raw):
-    """'$2,283.00' -> 2283.0 v CZK, prázdný nebo nulový řetězek -> None.
+    """'$2,283.00' -> 2283.0 in CZK, empty or zero string -> None.
 
-    Vrací vždy koruny; kolik jich je, říká CSV_CURRENCY, ne znak v řetězci.
+    Always returns crowns; how many of them there are is said by CSV_CURRENCY, not
+    by the character in the string.
     """
     price = to_float((raw or "").replace("$", "").replace(",", ""))
     if not price or price <= 0:
@@ -209,11 +216,11 @@ BATHROOMS_RE = re.compile(r"\d+(?:[.,]\d+)?")
 
 
 def parse_bathrooms(raw):
-    """'1.5 shared baths' -> 1.5, 'Private half-bath' -> 0.5, prazdne -> None.
+    """'1.5 shared baths' -> 1.5, 'Private half-bath' -> 0.5, empty -> None.
 
-    CSV ma pocet koupelen jako volny text, proto cislo z retezce jen vybereme.
-    'Half-bath' zadne cislo nema a polovina koupelny je 0.5, ne zadna - proto
-    ten druhy vetveni.
+    The CSV has the number of bathrooms as free text, so we just pick the number
+    out of the string. 'Half-bath' has no number at all and half a bathroom is 0.5,
+    not none - that is why the second branch.
     """
     text = (raw or "").strip()
     if not text or text == "None":
@@ -225,16 +232,17 @@ def parse_bathrooms(raw):
 
 
 def playable(row):
-    """Da se s radkou hrat = ma cenu i sve id, bez ceny neni co hadat.
+    """Can the row be played = it has a price and its id, without a price there is
+    nothing to guess.
 
-    Pouziva se na dvou mistech: pri vyberu vzorku se do nej berou jen hratelne
-    radky a parse_row na stejne podmince vraci None.
+    Used in two places: when selecting the sample only playable rows are taken into
+    it, and parse_row returns None on the same condition.
     """
     return bool((row.get("id") or "").strip()) and parse_price(row.get("price")) is not None
 
 
 def parse_row(row):
-    """CSV radek -> ListingCreate, nebo None kdyz se radkou neda hrat."""
+    """CSV row -> ListingCreate, or None when the row cannot be played."""
     if not playable(row):
         return None
     price = parse_price(row.get("price"))
@@ -243,8 +251,8 @@ def parse_row(row):
         external_id=external_id,
         city=CITY,
         country=COUNTRY,
-        # CSV sloupec neighbourhood je vzdy prazdny, ctvrt zije v cleansed
-        # textova policka se kraji na delku sloupce, viz clip()
+        # the CSV neighbourhood column is always empty, the quarter lives in cleansed
+        # text fields are cut to the length of the column, see clip()
         neighbourhood=clip(row.get("neighbourhood_cleansed") or "", 64) or None,
         latitude=to_float(row.get("latitude")),
         longitude=to_float(row.get("longitude")),
@@ -261,20 +269,22 @@ def parse_row(row):
     )
 
 
-# --- nahodny vyber ---------------------------------------------------------
+# --- random selection ------------------------------------------------------
 def sample_positions(csv_path, limit, seed):
-    """(vybrané pozice, kolik řádků celkem hraje) – výběr je náhodný z hratelných.
+    """(selected positions, how many rows play in total) - the selection is random
+    from the playable ones.
 
-    První průchod si nechává jen čísla pozic (slovník se ~10 000 řádky by v
-    paměti zabral víc než soubor sám), druhý průchod ve smyčce zpracuje jen
-    vybrané. Podmínka je jasná: CSV se mezi průchody nesmí měnit.
+    The first pass keeps only the position numbers (a dictionary with ~10 000 rows
+    would take more memory than the file itself), the second pass in the loop
+    processes only the selected ones. The condition is clear: the CSV must not
+    change between the passes.
 
-    Výběr se nedívá do databáze, takže SAMPLE_SEED vrátí vždy tytéž řádky a
-    spuštění se stejným seedem po přerušení dotáhne tu samou dávku.
+    The selection does not look into the database, so SAMPLE_SEED always returns the
+    same rows and a run with the same seed after an interruption finishes the same batch.
 
-    Počet hratelných řádků se vrací jen kvůli výtisku: hratelné jsou jen řádky
-    s načtenou cenou, takže malé číslo u velkého CSV znamená, že jsme nepochopili
-    jeho formát – ne že by v souboru data nebyla.
+    The number of playable rows is returned only because of the printout: playable
+    are only rows with a loaded price, so a small number for a big CSV means we did
+    not understand its format - not that the file would have no data.
     """
     with open(csv_path, newline="", encoding="utf-8") as csv_file:
         pool = [i for i, row in enumerate(csv.DictReader(csv_file)) if playable(row)]
@@ -283,9 +293,9 @@ def sample_positions(csv_path, limit, seed):
     return set(random.Random(seed).sample(pool, min(limit, len(pool)))), len(pool)
 
 
-# --- databaze --------------------------------------------------------------
+# --- database --------------------------------------------------------------
 def connect_db():
-    """Otevre SQLite a pusti schema, stejnou cestu i tabulky jako ma api."""
+    """Opens SQLite and runs the schema, the same path and the same tables as the api has."""
     os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
@@ -295,10 +305,10 @@ def connect_db():
 
 
 def imported_ids(conn):
-    """External id ubytovani, ktera jsou hotova = maji aspon jednu fotku.
+    """External ids of listings that are done = they have at least one photo.
 
-    Kontrola vyzaduje i fotku, takze Ctrl-C mezi vlozenim ubytovani a jeho
-    fotkami se pri pristim spusteni dotahne samo.
+    The check requires a photo too, so a Ctrl-C between inserting the listing and
+    its photos gets finished by itself on the next run.
     """
     rows = conn.execute(
         "SELECT DISTINCT l.external_id FROM listings l"
@@ -308,7 +318,7 @@ def imported_ids(conn):
 
 
 def insert_listing(conn, listing, photo_urls):
-    """Jedno ubytovani i s jeho fotkami v jednom commitu."""
+    """One listing with its photos in one commit."""
     cursor = conn.execute(
         "INSERT INTO listings (external_id, city, country, neighbourhood, latitude,"
         " longitude, name, property_type, room_type, accommodates, bedrooms, beds,"
@@ -340,12 +350,13 @@ def r2_client():
     )
 
 
-# --- jedna fota ------------------------------------------------------------
+# --- one photo -------------------------------------------------------------
 def image_kind(data):
-    """Jaky to je format, podle hlavicky, ne podle pripony v adrese.
+    """Which format it is, by the header, not by the extension in the address.
 
-    CDN vraci jpeg i kdyz adresa konci na .png, a do R2 musime dat spravny
-    Content-Type, jinak si prohlizec fotku místo zobrazeni stiahne.
+    The CDN returns jpeg even when the address ends with .png, and we have to give
+    R2 the right Content-Type, otherwise the browser downloads the photo instead of
+    displaying it.
     """
     if data[:8] == b"\x89PNG\r\n\x1a\n":
         return "image/png", ".png"
@@ -355,28 +366,28 @@ def image_kind(data):
 
 
 def object_key(external_id, order, ext):
-    """Klic souboru v R2, tj. cesta, kterou ukazuje konzole ve slozce R2_PREFIX.
+    """File key in R2, i.e. the path the console shows in the R2_PREFIX folder.
 
-    Adresa v databazi se sklada ze stejneho zakladu, jinak by fotka sedela
-    jinde, nez kam ukazuje. Prazdny prefix se zahodi, at nevznikne klic s
-    uvodnim lomitkem.
+    The address in the database is built from the same base, otherwise the photo
+    would sit somewhere else than where it points. An empty prefix gets dropped so
+    there is no key with a leading slash.
     """
     return "/".join(p for p in (R2_PREFIX.strip("/"), external_id, f"{order}{ext}") if p)
 
 
 def store_photos(session, s3, external_id, urls):
-    """Fotku stahne do pameti a rovnou posle do R2, vraci adresy do databaze.
+    """Downloads the photo into memory and sends it straight to R2, returns addresses for the database.
 
-    Na disku nic nezustava, leda bys zapnul SAVE_LOCAL. Klic v R2 je
-    <R2_PREFIX>/<id>/<poradi>.<ext> a presne ta adresa se uklada do databaze.
-    Duplicity se odpousteji podle obsahu, protoze Airbnb umi nabidnout tu samou
-    fotku pod dvema ruznymi jmeny.
+    Nothing stays on disk unless you turn on SAVE_LOCAL. The key in R2 is
+    <R2_PREFIX>/<id>/<order>.<ext> and exactly that address is stored in the
+    database. Duplicates are forgiven by content, because Airbnb can offer the same
+    photo under two different names.
     """
     public_urls = []
     seen = set()
     for url in urls:
         data = download(session, url)
-        time.sleep(PHOTO_DELAY)         # pauza patri za pozadavek, ne zakladani souboru
+        time.sleep(PHOTO_DELAY)         # the pause belongs after the request, not creating the file
         if data is None:
             continue
         digest = hashlib.md5(data).hexdigest()
@@ -392,14 +403,14 @@ def store_photos(session, s3, external_id, urls):
                 photo_file.write(data)
         key = object_key(external_id, order, ext)
         if s3 is None:
-            print(f"    {order}. {len(data) // 1024} kB {kind}")  # suchy beh nema jiny vystup
+            print(f"    {order}. {len(data) // 1024} kB {kind}")  # a dry run has no other output
         else:
             s3.put_object(Bucket=R2_BUCKET, Key=key, Body=data, ContentType=kind)
         public_urls.append(f"{R2_PUBLIC_BASE.rstrip('/')}/{key}")
     return public_urls
 
 
-# --- cele kolo -------------------------------------------------------------
+# --- the whole round -------------------------------------------------------
 def run():
     if SAVE_LOCAL:
         os.makedirs(PHOTO_DIR, exist_ok=True)
@@ -413,8 +424,8 @@ def run():
     mena = ("CSV je už v korunách" if CSV_CURRENCY == "CZK"
             else f"CSV je v {CSV_CURRENCY}, násobí se {USD_TO_CZK} (kurz z {RATE_DATE})")
     print(f"Měny: {mena}, do DB vždy letí CZK.")
-    # bez seedu to tahne kazdy beh jinak, ale cislo se vytiskne, takze jde po
-    # preruseni opsat a dotahnout tak tu samou davku
+    # without a seed it draws differently every run, but the number is printed, so
+    # after an interruption you can copy it and finish the same batch
     seed = SAMPLE_SEED if SAMPLE_SEED is not None else random.randrange(1_000_000)
     wanted, playable_count = sample_positions(LISTINGS_CSV, LIMIT, seed)
     print(f"Náhodný vzorek: {len(wanted)} z {playable_count} hratelných řádků, seed={seed}"
@@ -430,13 +441,13 @@ def run():
                 try:
                     listing = parse_row(row)
                 except ValidationError as error:
-                    # jeden radek nesmi zastavit cely beh - dalsi mesto muze mit
-                    # CSV s jinymi rozmery nez to prazske a prislo by to az tady
+                    # one row must not stop the whole run - another city can have
+                    # a CSV with other dimensions than the prague one and it would show up only here
                     problem = error.errors()[0]
                     stats["neplatny"] += 1
                     print(f"  {row.get('id')}: preskoceno ({problem['loc'][0]}: {problem['type']})")
                     continue
-                if listing is None:           # CSV se mezi pruchody zmenil
+                if listing is None:           # the CSV changed between the passes
                     continue
                 if listing.external_id in done:
                     stats["jiz v db"] += 1
@@ -457,9 +468,9 @@ def run():
                     insert_listing(conn, listing, public_urls)
                 done.add(listing.external_id)
                 stats["vlozeno"] += 1
-                # pocitadlo sedi az od velkosti vylosovane davky, ne od LIMITu:
-                # davka muze byt mensi (LIMIT=0 muze byt i 0), cast uz v DB byla
-                # driv a fota se nepovedla, to vsechno jsou obsluzene radky davky
+                # the counter is right only from the size of the drawn batch, not from LIMIT:
+                # the batch can be smaller (LIMIT=0 can be 0 too), part was already in the DB
+                # earlier and a photo did not work out, all of that is handled rows of the batch
                 obslouzeno = sum(stats.values())
                 print(f"  {listing.external_id}: {len(public_urls)} fotek, "
                       f"{listing.price:,.0f} / noc, zbyva {len(wanted) - obslouzeno} z davky")
@@ -476,7 +487,7 @@ def run():
 
 
 def test_page(url):
-    """Slouzi jen k nahlednuti, co scraper najde na jedne strance."""
+    """Serves only for a peek at what the scraper finds on one page."""
     session = requests.Session()
     session.headers.update(HEADERS)
     urls = extract_photo_urls(fetch_page(session, url))

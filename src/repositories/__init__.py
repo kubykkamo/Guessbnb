@@ -1,4 +1,4 @@
-"""Persistance: `connect()` v db.py a CRUD funkce v jednotlivých modulech."""
+"""Persistence: `connect()` in db.py and CRUD functions in the individual modules."""
 
 from src.repositories import listing_repository, photo_repository, user_repository
 from src.repositories.db import connect

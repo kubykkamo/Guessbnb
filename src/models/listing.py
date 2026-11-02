@@ -1,4 +1,4 @@
-"""LISTINGS table - ubytování importované ETL skriptem."""
+"""LISTINGS table - listings imported by the ETL script."""
 
 from pydantic import BaseModel, Field
 

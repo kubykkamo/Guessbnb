@@ -1,4 +1,4 @@
-"""Pydantic modely podle ERD (docs/ERD.drawio). Hra samotná žije jen v RAM."""
+"""Pydantic models according to the ERD (docs/ERD.drawio). The game itself lives only in RAM."""
 
 from src.models.listing import Listing, ListingCreate
 from src.models.photo import Photo, PhotoCreate

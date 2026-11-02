@@ -1,9 +1,9 @@
-"""Konstanty hry. Jediné místo, kde se mění pravidla — viz docs/backend_roadmap.md."""
+"""Game constants. The only place where the rules change - see docs/backend_roadmap.md."""
 
-ROOM_CODE_LENGTH = 6      # wireframy ukazují 5, RoomCode v ERD říká 6 → 6, konstanta je jeden řádek
-CODE_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"   # bez I, O, 0, 1 – ať se kód dá opsat ze slova
-ROUNDS_RANGE = (3, 10)    # rozsah z wireframu, default 5 podle Sequential.drawio
-MAX_PLAYERS = 10          # Connected players (3 / 10) z wireframu
-ROUND_SECONDS = 30        # smyčka v Sequential.drawio
-REVEAL_SECONDS = 8        # mock píše "Next round in 5…", necháváme 8 s na přečtení výsledků
-PRICE_BAND = (500, 20_000)   # CZK/noc – spodní mez stříhá výlety, horní hrady za 1,1 mil.
+ROOM_CODE_LENGTH = 6      # wireframes show 5, RoomCode in the ERD says 6 -> 6, the constant is one line
+CODE_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"   # without I, O, 0, 1 - so the code can be copied from speech
+ROUNDS_RANGE = (3, 10)    # range from the wireframe, default 5 according to Sequential.drawio
+MAX_PLAYERS = 10          # Connected players (3 / 10) from the wireframe
+ROUND_SECONDS = 30        # the loop in Sequential.drawio
+REVEAL_SECONDS = 8        # the mock writes "Next round in 5…", we keep 8 s to read the results
+PRICE_BAND = (500, 20_000)   # CZK/night - the lower bound cuts trips, the upper castles for 1.1 mil.
