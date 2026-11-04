@@ -23,6 +23,12 @@ class Clock(Protocol):
         """Epoch milliseconds."""
 
 @dataclass
+class Listing:
+    id: int
+    city: str
+    price: int
+
+@dataclass
 class Player:
     player_id: str
     display_name: str
@@ -235,7 +241,7 @@ class Room:
 
     def _roster(self) -> list[Player]:
         return list(self.players.values())
-    
+
     def _standings(self) -> list[dict]:
         """Sorted by score; equal scores keep seat order (the roadmap does not pick a tiebreak)."""
         return [{"player_id": p.player_id, "display_name": p.display_name, "score": p.score}
