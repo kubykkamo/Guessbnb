@@ -75,4 +75,13 @@ async def test_old_guess_doesnt_change_score_stale_round(room_with_two_players):
     assert events[-1].code == "STALE_ROUND"
     assert room.players["p1"].score == last_score
     
+async def test_second_start_equals_invalid_state(room_with_two_players):
+    room = room_with_two_players
+
+    dummy_listings = [Listing(id="1", city="Brno", price=1700)]
     
+    await room.handle(StartGame(player_id="p1", listings=dummy_listings))
+
+    event2 = await room.handle(StartGame(player_id="p1", listings=dummy_listings))
+
+    assert event2[-1].code == "INVALID_STATE"
