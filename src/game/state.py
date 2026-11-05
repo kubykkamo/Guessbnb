@@ -6,7 +6,7 @@ from typing import Protocol
 
 from src.config import REVEAL_SECONDS, ROUND_SECONDS
 from src.game.scoring import error_pct, points
-from src.models import Listing
+
 
 
 class Phase(Enum):
@@ -129,23 +129,26 @@ class Room:
         """Command -> events. Never touches the DB, the socket or a real clock."""
         match cmd:
             case SetSettings(player_id=pid, city=city, rounds=rounds):
-                if err := self._require_host(pid, Phase.LOBBY):
-                    return [err]
+                if err := self._require_phase(phase=Phase.LOBBY): return [err]
+                if err := self._require_host(pid): return [err]
                 return self._set_settings(city, rounds)
 
             case StartGame(player_id=pid, listings=listings):
-                if err := self._require_host(pid, Phase.LOBBY):
-                    return [err]
+                if err := self._require_phase(phase=Phase.LOBBY): return [err]
+                if err := self._require_player(pid): return [err]
+                if err := self._require_host(pid): return [err]
                 return self._start_game(listings)
 
             case SubmitGuess(player_id=pid, round=token, price=price):
-                if err := self._require_player(pid, Phase.ROUND_OPEN):
+                if err := self._require_player(pid):
+                    return [err]
+                if err := self._require_phase(Phase.ROUND_OPEN):
                     return [err]
                 return self._submit_guess(pid, token, price)
 
             case NextRound(player_id=pid):
-                if err := self._require_host(pid, Phase.REVEALING):
-                    return [err]
+                if err := self._require_phase(phase=Phase.REVEALING): return [err]
+                if err := self._require_host(pid): return [err]
                 return self._advance()
 
             case DeadlineReached(token=token):
@@ -158,17 +161,23 @@ class Room:
 
     # --- guards ---
 
-    def _require_player(self, player_id: str, phase: Phase) -> Error | None:
+    def _require_player(self, player_id: str) -> Error | None:
         if player_id not in self.players:
             return Error("NOT_SEATED", f"{player_id} is not in this room")
+        return None
+
+    def _require_phase(self, phase: Phase) -> Error | None:
         if self.phase is not phase:
             return Error("INVALID_STATE", f"{self.phase.value}: needs {phase.value}")
+        return None
+    
+    def _require_host(self, player_id: str) -> Error | None:
+        if player_id not in self.players:
+            return Error("NOT_SEATED", "player not found")
 
-    def _require_host(self, player_id: str, phase: Phase) -> Error | None:
-        if err := self._require_player(player_id, phase):
-            return err
         if not self.players[player_id].is_host:
             return Error("NOT_HOST", "only the host may do that")
+        return None
 
     # --- transitions ---
 
@@ -195,7 +204,7 @@ class Room:
     def _submit_guess(self, player_id: str, token: int, price: int) -> list:
         if token != self.round_token:
             return [Error("STALE_ROUND", f"guess carries round {token}")
-                    ] if True else []      # state untouched - see the STALE_ROUND acceptance
+                    ]     # state untouched - see the STALE_ROUND acceptance
         self.guesses[player_id] = price
         waiting = self._waiting()
         events: list = [GuessAck(self.round_no), GuessCount(len(self.guesses), len(waiting) + len(self.guesses))]
