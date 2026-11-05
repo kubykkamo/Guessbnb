@@ -57,6 +57,22 @@ async def test_only_one_of_two_submits_round_ends(room_with_two_players):
     
 
         
+async def test_old_guess_doesnt_change_score_stale_round(room_with_two_players):
+    room = room_with_two_players
 
+    dummy_listings = [Listing(id="1", city="Brno", price=1700)]
 
+    await room.handle(StartGame(player_id="p1", listings=dummy_listings))
+
+    token = room.round_token
+
+    last_score = room.players["p1"].score
+
+    room.round_token = "round2_token"
+
+    events = await room.handle(SubmitGuess(player_id="p1", round=token, price=1700))
+
+    assert events[-1].code == "STALE_ROUND"
+    assert room.players["p1"].score == last_score
+    
     
