@@ -18,17 +18,16 @@ class FakeClock():
 def clock():
     return FakeClock()
         
-
+@pytest.fixture
 async def seed_listings():
     db = await aiosqlite.connect(":memory:")
 
     await db.execute("""
-    
     CREATE TABLE LISTINGS (
-    id TEXT PRIMARY KEY
-    city TEXT
+    id TEXT PRIMARY KEY,
+    city TEXT,
     price INTEGER
-    )
+    );
     """
     )
 
