@@ -105,3 +105,33 @@ async def test_second_start_equals_invalid_state(room_with_two_players):
     event2 = await room.handle(StartGame(player_id="p1", listings=dummy_listings))
 
     assert event2[-1].code == "INVALID_STATE"
+
+async def test_guess_at_deadline_instant_evaluates_once(room_with_two_players):
+    room = room_with_two_players
+
+    dummy_listings = [Listing(id="1", city="Brno", price=1700),
+                          Listing(id="2", city="Brno", price=2400)]
+    
+    await room.handle(StartGame(player_id="p1", listings=dummy_listings))
+
+    token = room.round_token
+
+    await room.handle(SubmitGuess(player_id="p1", round=token, price=1800))
+
+    room.clock.advance(30)
+    
+    events_p2 = await room.handle(SubmitGuess(player_id="p2", round=token, price=2000))
+
+    events_p3 = await room.handle(DeadlineReached(token=token))
+
+    assert isinstance(events_p2[-1], RoundEnded)
+    p2_result = next(r for r in events_p2[-1].results if r["player_id"] == "p2")
+    assert p2_result["points"] == 67
+    
+        # evaluated exactly once (#L181) - the timer that lost the race must not score it again
+    assert len([e for e in events_p2 + events_p3 if isinstance(e, RoundEnded)]) == 1
+    assert room.players["p2"].score == 67  
+
+    pprint(events_p2)
+
+
