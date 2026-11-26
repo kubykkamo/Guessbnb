@@ -133,7 +133,7 @@ async def test_guess_at_deadline_instant_evaluates_once(room_with_two_players):
     assert len([e for e in events_p2 + events_p3 if isinstance(e, RoundEnded)]) == 1
     assert room.players["p2"].score == 67  
 
-    pprint(events_p2)
+    # pprint(events_p2)
 
 
 # --- three more from the list: arrange + act are yours, the asserts are fixed.
@@ -181,7 +181,7 @@ async def test_full_game_reaches_game_over(room_with_two_players):
     # ARRANGE - settings (host only, LOBBY), a draw big enough for the round count, start
     # ACT     - play every round to the very end; bind the events of the LAST handle()
     #           call to `events`
-    pprint(events)
+    # pprint(events)
 
     assert isinstance(events[-1], GameFinished)
     assert room.phase is Phase.GAME_OVER
@@ -197,41 +197,69 @@ async def test_full_game_reaches_game_over(room_with_two_players):
     #MUTATION - name the one line in state.py that, changed, turns this red.
 
 
-# async def test_stale_deadline_is_discarded(room_with_two_players):
-#     """#L65 - a timer carrying an old round's token is discarded rather than answered.
-#     Get into round 2 the way the game really does; P-021 forbids assigning a token by
-#     hand.
-#     """
-#     room = room_with_two_players
-
-#     # ARRANGE - reach round 2 for real, then remember the scores in `scores_before`
-#     # ACT     - send the DEADLINE of round 1 and bind its events to `events`
-
-#     assert events == []                              # not [Error(...)], not [RoundEnded]
-#     assert room.round_no == 2
-#     assert room.round_token == 2                     # a counter: once per round opened
-#     assert {p.player_id: p.score for p in room.players.values()} == scores_before
-
-#     # MUTATION - name the one line in state.py that, changed, turns this red.
+async def test_stale_deadline_is_discarded(room_with_two_players):
+    """#L65 - a timer carrying an old round's token is discarded rather than answered.
+    Get into round 2 the way the game really does; P-021 forbids assigning a token by
+    hand.
+    """
+    room = room_with_two_players
 
 
-# async def test_guard_precedence(room_with_two_players):
-#     """Which guard wins when two conditions are bad at once. P-023: 5f476bb changed
-#     this order silently and no test protested - one test, because the matrix is the
-#     thing that regressed, not the individual codes.
-#     """
-#     room = room_with_two_players
+    # ARRANGE - reach round 2 for real, then remember the scores in `scores_before`
 
-#     # ACT 1 - p2 (seated, not host) sends set_settings while still in LOBBY -> `in_lobby`
-#     # ACT 2 - start the game, then send that same command again in ROUND_OPEN -> `in_round`
-#     # ACT 3 - a player_id nobody has ever seated guesses in ROUND_OPEN       -> `ghost`
+    token = room.round_token
+    
+    dummy_listings = [Listing(id="1", city="Brno", price=1700),
+                                  Listing(id="2", city="Brno", price=2400),
+                                  Listing(id="3", city="Brno", price=2100)]
+    
+    await room.handle(StartGame(player_id="p1", listings=dummy_listings))
+    round1_token = room.round_token  # až po startu 1. kola
 
-#     assert in_lobby[-1].code == "NOT_HOST"           # phase passed, the host check stopped it
-#     assert in_round[-1].code == "INVALID_STATE"      # phase is checked FIRST for this command...
-#     assert ghost[-1].code == "NOT_SEATED"            # ...but the player is checked first for that one
-#     assert room.phase is Phase.ROUND_OPEN            # none of the three moved the machine
-#     assert room.players["p2"].score == 0
+    await room.handle(SubmitGuess(player_id="p1", round=round1_token, price=1900))
+    await room.handle(SubmitGuess(player_id="p2", round=round1_token, price=2100))
+    await room.handle(NextRound(player_id="p1"))  # teď jsi reálně ve 2. kole
 
-#     # MUTATION - name the one line in state.py that, changed, turns this red.
+    scores_before = {p.player_id: p.score for p in room.players.values()}
+    events = await room.handle(DeadlineReached(round1_token))
+    pprint(events)
+    
+    
+
+
+    # ACT     - send the DEADLINE of round 1 and bind its events to `events`
+
+    assert events == []                              # not [Error(...)], not [RoundEnded]
+    assert room.round_no == 2
+    assert room.round_token == 2                     # a counter: once per round opened
+    assert {p.player_id: p.score for p in room.players.values()} == scores_before
+
+    # MUTATION - name the one line in state.py that, changed, turns this red.
+
+
+async def test_guard_precedence(room_with_two_players):
+    """Which guard wins when two conditions are bad at once. P-023: 5f476bb changed
+    this order silently and no test protested - one test, because the matrix is the
+    thing that regressed, not the individual codes.
+    """
+    room = room_with_two_players
+    dummy_listings = [Listing(id="1", city="Brno", price=1700),
+                                      Listing(id="2", city="Brno", price=2400),
+                                      Listing(id="3", city="Brno", price=2100)]
+
+    # ACT 1 - p2 (seated, not host) sends set_settings while still in LOBBY -> `in_lobby`
+    in_lobby = await room.handle(SetSettings(player_id="p2", city="Brno",  rounds=3))
+    # ACT 2 - start the game, then send that same command again in ROUND_OPEN -> `in_round`
+    await room.handle(StartGame(player_id="p1", listings=dummy_listings))
+    in_round = await room.handle(SetSettings(player_id="p2", city="Brno", rounds=3))
+    # ACT 3 - a player_id nobody has ever seated guesses in ROUND_OPEN       -> `ghost`
+    ghost = await room.handle(SubmitGuess(player_id="aaa", round=room.round_token, price=2000))
+    assert in_lobby[-1].code == "NOT_HOST"           # phase passed, the host check stopped it
+    assert in_round[-1].code == "INVALID_STATE"      # phase is checked FIRST for this command...
+    assert ghost[-1].code == "NOT_SEATED"            # ...but the player is checked first for that one
+    assert room.phase is Phase.ROUND_OPEN            # none of the three moved the machine
+    assert room.players["p2"].score == 0
+
+    # MUTATION - name the one line in state.py that, changed, turns this red.
 
 
