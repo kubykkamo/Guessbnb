@@ -2,10 +2,11 @@
 
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect
 
 from src.repositories import listing_repository
 from src.repositories.db import connect
+
 
 
 @asynccontextmanager
@@ -22,6 +23,9 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="Guessbnb API", lifespan=lifespan)
 
+from src.api import ws
+app.include_router(ws.router)
+
 
 # F0 ------ endpoints ------
 
@@ -37,3 +41,5 @@ async def get_cities(request: Request) -> dict[str, list[str]]:
     """Cities list that will be used for host choice of playing"""
     cities = await listing_repository.list_cities(request.app.state.conn)
     return {"cities": cities}
+
+# F2 ----
